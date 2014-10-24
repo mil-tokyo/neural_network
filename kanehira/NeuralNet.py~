@@ -26,7 +26,7 @@ class FCLayer:
         delta=self.activate_div(self.inp) * np.dot(self.W.T,prev_delta)
         return delta
 
-    def Update(self):
+    def Update(self,eta):
         self.div=np.dot(np.matrix(self.delta).T,np.matrix(self.inp))
         self.W = np.array(self.W - eta * self.div)
         if np.isnan(self.W).any():
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     NN=NeuralNetwork(setting)
 
     ## train Network ##
-    NN.train(train_data,train_label,eta)
+    NN.train(train_data,train_label)
 
     ## predict ##
     result=NN.predict(test_data,label_dim)

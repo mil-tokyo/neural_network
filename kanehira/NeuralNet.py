@@ -120,15 +120,17 @@ class NeuralNetwork:
 if __name__ == "__main__":
 
     ## load dataset and preprocess ##
-    from sklearn.datasets import load_digits
+    from sklearn.datasets import load_digits,fetch_mldata
     from sklearn import preprocessing
     from sklearn.metrics import classification_report
     from sklearn.cross_validation import train_test_split
     
-    digits = load_digits()
-    data = preprocessing.normalize(digits.data, norm='l2')
+    dataset = load_digits()
+    dataset = fetch_mldata('MNIST original', data_home='.')
+
+    data = preprocessing.normalize(dataset.data, norm='l2')
     lb = preprocessing.LabelBinarizer()
-    label=lb.fit_transform(digits.target)
+    label=lb.fit_transform(dataset.target)
 
     inp_dim=data.shape[1]
     label_dim=label.shape[1]
