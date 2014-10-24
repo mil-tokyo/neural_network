@@ -1,0 +1,14 @@
+import numpy as np
+
+h1=10
+h2=5
+h3=0
+W1=np.ones((h2,h1))
+W2=np.ones((h3,h2))
+
+x=np.ones(10)
+out=math.tanh(np.dot(W1,x))
+
+y=np.dot(W2,out)
+
+print y
