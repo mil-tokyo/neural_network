@@ -8,7 +8,7 @@ import numpy as np
 from ml_perceptron import MultiLayerPerceptron
 from sklearn.datasets import load_digits, fetch_mldata
 from sklearn.cross_validation import train_test_split
-from sklearn.preprocessing import LabelBinarizer
+from sklearn.preprocessing import normalize, LabelBinarizer
 from sklearn.metrics import confusion_matrix, classification_report
 
 
@@ -22,7 +22,7 @@ def classification(database='MNIST'):
     labels =
     # Normalize data
     X = X.astype(np.float64)
-    X /= X.max()
+    X = normalize(X, norm='l2')
     # Split dataset
     X_train, X_test, labels_train, labels_test = train_test_split(X, labels, test_size=0.05)
     # Transform target data format to 1 of K description
