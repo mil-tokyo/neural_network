@@ -2,30 +2,33 @@ import numpy as np
 import math
 
 class FCLayer:
+    
     def __init__(self,h,W,mode):
         ## number of hidden element ##
         self.h=h
         self.W=W
         self.mode=mode
+        if mode == "Output":
+            self.activate=lambda x:np.exp(x) / np.sum(np.exp(x)) 
+        elif mode == "Hidden":
+            self.activate=np.tanh
+        self.activate_div=lambda x:(1-np.tanh(x)**2)
 
     def CalcForward(self,inp):
         self.inp=inp
         self.a=np.dot(self.W,self.inp)
+        return self.activate(self.a)
 
-        if self.mode=="Output":
-            return self.a 
-        elif self.mode=="Hidden":
-            return np.tanh(self.a)
 
     def CalcBackward(self,prev_delta):
         self.delta=prev_delta
-        delta=(1-np.tanh(self.inp)**2) * np.dot(self.W.T,prev_delta)
+        delta=self.activate_div(self.inp) * np.dot(self.W.T,prev_delta)
         return delta
 
     def Update(self,eta):
         self.div=np.dot(np.matrix(self.delta).T,np.matrix(self.inp))
         self.W = np.array(self.W - eta * self.div)
-        
+
 
     def __str__(self):
         return "the number of element:%d\nmode:%s\n"%(self.h,self.mode)
