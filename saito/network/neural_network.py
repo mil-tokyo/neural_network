@@ -17,9 +17,12 @@ class NeuralNetwork(AbstractNeuralNetwork):
         self.layers = []
         self.loss = layer.loss.Loss('square')
         self.rate = 0.05
+        self.activate_function = 'sigmoid'
 
-        for i in range(0,len(num_unit_of_each_layer)):
-            self.layers.append(layer.fully_connected_layer.FullyConnectedLayer(num_unit_of_each_layer[i]))
+        for i in range(0,len(num_unit_of_each_layer)-1):
+            self.layers.append(layer.fully_connected_layer.FullyConnectedLayer(num_unit_of_each_layer[i], self.activate_function))
+
+        self.layers.append(layer.fully_connected_layer.FullyConnectedLayer(num_unit_of_each_layer[i], self.activate_function, is_output=True))
 
         for i in range(1,len(self.layers)):
             previous_layer_node = self.layers[i-1].node_num
@@ -29,12 +32,12 @@ class NeuralNetwork(AbstractNeuralNetwork):
 #        super(ConvolutionalNeuralNetwork, self).test()
         print('load config')
 
-
     def learn(self):
         print "learn start"
+        total_error = 0
         layers_num = len(self.num_unit_of_each_layer)
         for i in range(0,len(self.train_labels)):
-            if i % 100 == 0:
+            if i % 100 == 0:                
                 print str(i)+" images learned"
             # go forward
             input_node = self.train_images[i]            
@@ -48,8 +51,10 @@ class NeuralNetwork(AbstractNeuralNetwork):
             label = self.train_labels[i]
             self.loss.loss(out,label)
             err = self.loss.error
+            total_error += err
             if i%100 == 0:
-                print "error: "+str(err)
+                print "error: "+str(total_error/100.0)
+                total_error = 0
             self.layers[layers_num-1].grad = self.loss.grad
             
             for j in range(1,layers_num):
