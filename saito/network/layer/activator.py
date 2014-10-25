@@ -22,12 +22,7 @@ class Activator():
         elif func_name == 'softmax':
             y = np.exp(x)/sum(np.exp(x))
         elif func_name == 'relu':
-            if np.isscalar(x):
-                y = float(max(0,x))
-            else:
-                y = x
-                for i in range(0,len(x)):
-                    y[i] = max(0,y[i])
+            y = np.maximum(x,0)
         else:
             error = '''
             it's an unsupported function
