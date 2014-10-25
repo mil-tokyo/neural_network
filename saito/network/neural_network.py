@@ -9,7 +9,8 @@ class NeuralNetwork(AbstractNeuralNetwork):
 #        self.load_config()
         # make layers
         self.load_config()
-        dataset_path = '/Users/tomoakisaito/Documents/dataset'
+#        dataset_path = '/Users/tomoakisaito/Documents/dataset'
+        dataset_path = '../dataset'
         self.load_images(dataset_path+'/mnist.pkl.gz')
         print self.train_images.shape
         print self.train_labels
