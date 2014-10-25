@@ -118,7 +118,7 @@ class NeuralNetwork:
 
         
 if __name__ == "__main__":
-
+    
     ## load dataset and preprocess ##
     from sklearn.datasets import load_digits,fetch_mldata
     from sklearn import preprocessing
