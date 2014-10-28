@@ -61,4 +61,4 @@ class OutputLayer(Layer):
     def backward(self,label):
         return self.ovector-label
 
-dictlayer={'FC':FCLayer, 'Output':OutputLayer, 'Tanh':TanhLayer}
+dictlayer={'FC':FCLayer, 'Output':OutputLayer, 'Tanh':TanhLayer,'ReLU':ReLULayer}
