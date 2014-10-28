@@ -44,7 +44,7 @@ class ReLULayer(Layer):
     """apply ReLU to linear output"""
     def forward(self,ivector):
         self.ivector=ivector
-        self.ovector=np.max(self.ivector,0)
+        self.ovector=np.maximum(self.ivector,0)
         return self.ovector
 
     def backward(self,odiff):
