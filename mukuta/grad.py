@@ -23,4 +23,21 @@ class Gradient:
         self.dnum=0
         return newweight
 
-dictgrads={'Grad':Gradient}
+class AdaGrad(Gradient):
+    """Adaptive Gradient"""
+    def __init__(self):
+        Gradient.__init__(self)
+        self.sumgrad=None
+
+    def update(self,weight):
+        if (self.sumgrad==None):
+            self.sumgrad=np.ones(weight.shape)
+        newweight=weight-learnparam*self.grad/self.dnum/(self.sumgrad ** 0.5)
+        self.sumgrad=self.sumgrad + (self.grad * (1.0/self.dnum))**2
+        self.grad=None
+        self.dnum=0
+        return newweight
+
+
+
+dictgrads={'Grad':Gradient,'AdaGrad':AdaGrad}
