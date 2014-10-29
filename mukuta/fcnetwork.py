@@ -36,7 +36,7 @@ class FCNetwork:
             randinds=np.random.permutation(datanum)
             for i in range(datanum/nbatch):
                 inds=randinds[nbatch*i:nbatch*(i+1)]
-                self.minibatch(feature[randinds],label[randinds])
+                self.minibatch(feature[inds],label[inds])
 
 
 
