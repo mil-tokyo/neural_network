@@ -24,12 +24,12 @@ class FullyConnectedLayer(AbstractLayer):
         
 
     def forward(self):
-        node = np.dot(self.weight, self.node) + self.bias
+        next_node = np.dot(self.weight, self.node) + self.bias
         if self.is_softmax:
-            node = self.ac.activate(node,'softmax')
+            next_node = self.ac.activate(next_node,'softmax')
         else:
-            node = self.ac.activate(node)
-        return node
+            next_node = self.ac.activate(next_node)
+        return next_node
             
 
     def back(self, next_derr=None):
