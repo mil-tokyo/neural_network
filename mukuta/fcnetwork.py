@@ -24,19 +24,19 @@ class FCNetwork:
             layer.update()
 
     def minibatch(self,feature,label):
-        datanum=feature.shape[1]
+        datanum=feature.shape[0]
         for i in range(datanum):
-            self.regression(feature[:,i])
-            self.backprop(label[:,i])
+            self.regression(feature[i])
+            self.backprop(label[i])
         self.update()
 
     def train(self,feature,label,niter,nbatch):
-        datanum=feature.shape[1]
+        datanum=feature.shape[0]
         for it in range(niter):
             randinds=np.random.permutation(datanum)
             for i in range(datanum/nbatch):
                 inds=randinds[nbatch*i:nbatch*(i+1)]
-                self.minibatch(feature[:,randinds],label[:,randinds])
+                self.minibatch(feature[randinds],label[randinds])
 
 
 
