@@ -1,0 +1,18 @@
+
+
+
+from layers import *
+
+
+
+class Network:
+
+    def __init__(self, structure):
+        print 'hoge'
+
+
+    def set_layers(self, structure):
+        a = Layer()
+        b = Layer()
+        a.connect(b)
+        
