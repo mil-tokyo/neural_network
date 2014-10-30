@@ -1,0 +1,25 @@
+
+
+
+
+class Layer:
+
+    def __init__(self, prev=None, next=None):
+        self.prev, self.next = prev, next
+
+
+    def get_prev(self):
+        return self.prev
+
+    def get_next(self):
+        return self.next
+
+
+
+
+
+class FullyConnected(Layer):
+
+    def __init__(self):
+        Layer.__init__(prev, next)
+

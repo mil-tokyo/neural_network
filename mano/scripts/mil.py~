@@ -1,0 +1,16 @@
+from argparse import ArgumentParser
+
+
+
+
+
+
+if __name__ == '__main__':
+
+    parser = ArgumentParser(description='Process Deep Learning.')
+    parser.add_argument('-m', type=str, dest='mode', action='store',
+                        help='set mode (train or test)', required=True)
+    parser.add_argument('-n', type=str, dest='name', action='store',
+                        help='set name of your network', required=True)
+    args = parser.parse_args()
+    print args.mode, args.name
