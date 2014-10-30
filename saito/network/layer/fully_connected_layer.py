@@ -34,12 +34,14 @@ class FullyConnectedLayer(AbstractLayer):
 
     def back(self, next_derr=None):
         if next_derr is None:
-            self.derr = self.grad * self.ac.deactivate(self.node)
+            # self.derr = self.grad * self.ac.deactivate(self.node)
+            self.derr = self.grad
             return
 
         self.dbias = next_derr
         self.grad = np.dot(self.weight.T, next_derr)
-        self.dweight = np.array(np.mat(next_derr).T*np.mat(self.node))
+        # self.dweight = np.array(np.mat(next_derr).T*np.mat(self.node))
+        self.dweight = np.outer(next_derr, self.node)
         self.derr = self.grad * self.ac.deactivate(self.node)
 
     def update(self, rate):

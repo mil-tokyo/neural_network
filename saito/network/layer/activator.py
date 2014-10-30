@@ -51,12 +51,7 @@ class Activator():
         elif func_name == 'arctan':
             y = 1/(1+np.power(np.tan(np.pi*(x-1/2.0)),2))/np.pi
         elif func_name == 'relu':
-            if np.isscalar(x):
-                y = float(max(0,x))
-            else:
-                y = x
-                for i in range(0,len(x)):
-                    y[i] = max(0,y[i])
+            y = np.sign(x)
         else:
             error = '''
             it's an unsupported function

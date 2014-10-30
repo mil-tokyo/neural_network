@@ -4,7 +4,7 @@ import layer
 
 class NeuralNetwork(AbstractNeuralNetwork):
 
-    def __init__(self, num_unit_of_each_layer):
+    def __init__(self, num_unit_of_each_layer, batch_size = 120):
         print "initializing network"
         #self.load_config()
         # make layers
