@@ -8,6 +8,7 @@ class FCNetwork:
         for i in range(len(lst)-1):
             self.layers.append(layer.dictlayer['FC'](lst[i],lst[i+1],method))
             self.layers.append(layer.dictlayer[nonlinear]())
+        self.layers.pop(-1)
         self.layers.append(layer.dictlayer['Output']())
 
     def regression(self,ivector):

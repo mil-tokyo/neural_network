@@ -38,7 +38,7 @@ class TanhLayer(Layer):
         return self.ovector
 
     def backward(self,odiff):
-        return odiff * (self.ovector+1)/2
+        return odiff * (1-self.ovector**2)/2
 
 class ReLULayer(Layer):
     """apply ReLU to linear output"""
