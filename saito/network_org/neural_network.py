@@ -1,27 +1,39 @@
 from abstract_neural_network import AbstractNeuralNetwork
 import numpy as np
-import layers
+import layer
 
 class NeuralNetwork(AbstractNeuralNetwork):
 
     def __init__(self, num_unit_of_each_layer, batch_size = 120):
         print "initializing network"
-
+        #self.load_config()
+        # make layers
         self.load_config()
         #dataset_path = '/Users/tomoakisaito/Documents/dataset'
         dataset_path = '../dataset'
         #self.load_images(dataset_path+'/mnist.pkl.gz')
         self.load_mnist('/data/ishimochi0/dataset/mnist')
+
+        # print "label : "+str(self.test_labels[10])
+        # for i in range(0,28):
+        #     for j in range(0,28):
+        #         print self.test_images[10,i*28+j],
+        #         # if self.test_images[10,i*28+j]>0.5:
+        #         #     print "*",
+        #         # else:
+        #         #     print "-",
+        #     print ""
+        # print self.train_images.shape
         
         print self.train_labels
         self.num_unit_of_each_layer = num_unit_of_each_layer
         self.layers = []
-        self.loss = layers.loss.Loss('square')
+        self.loss = layer.loss.Loss('square')
         self.rate = 0.05
         self.activate_function = 'sigmoid'
 
         for i in range(0,len(num_unit_of_each_layer)):
-            self.layers.append(layers.fully_connected_layer.FullyConnectedLayer(num_unit_of_each_layer[i], self.activate_function))
+            self.layers.append(layer.fully_connected_layer.FullyConnectedLayer(num_unit_of_each_layer[i], self.activate_function))
         self.layers[len(num_unit_of_each_layer)-2].is_softmax = True
 
         for i in range(0,len(self.layers)-1):
@@ -58,7 +70,7 @@ class NeuralNetwork(AbstractNeuralNetwork):
                 if i%print_interval == 0:
                     print "error: "+str(total_error/float(print_interval))
                     total_error = 0
-                self.layers[layers_num-1].derr = self.loss.grad
+                self.layers[layers_num-1].grad = self.loss.grad
                 self.layers[layers_num-1].back()
             
                 for j in range(1,layers_num):

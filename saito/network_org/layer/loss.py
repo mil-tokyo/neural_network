@@ -18,7 +18,7 @@ class Loss():
 
         if func_name == 'square':
             self.grad = out - label_array
-            self.error = np.dot(grad,grad)/2
+            self.error = np.dot(self.grad, self.grad)/2
         else:
             error = '''
             it's an unsupported function
