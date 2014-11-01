@@ -41,7 +41,7 @@ class PoolingLayer(AbstractLayer):
                 
         return max_value, max_pos
 
-    def back(self,next_node=None, next_derr):
+    def back(self,next_node=None,next_derr=None):
         self.derr = self.node
         for i in xrange(len(next_derr)):
             self.derr[i] = poolback2d(next_derr[i], self.max_pos[i])
@@ -76,7 +76,7 @@ class ConvolutionalLayer(AbstractLayer):
 
     def forward(self):
         if self.stride != 1:
-            raiase NameError("stride except 1 is unsupported")
+            raise NameError("stride except 1 is unsupported")
         next_node = []
         for i in xrange(len(self.weight)):
             next_node.append(convolve2d(self.node[0],self.weight[i],mode='valid'))
@@ -98,10 +98,11 @@ class ConvolutionalLayer(AbstractLayer):
 class FullyConnectedLayer(AbstractLayer):
     def __init__(self, node_num, next_node_num):
         self.node_num = node_num
-        self.node = np.zeros(node_num)
+        self.node = [None]
         self.grad = None
         self.dweight = None
         self.dbias = None
+        self.derr = [None]
 
         '''
         initialize weight with random
@@ -113,14 +114,23 @@ class FullyConnectedLayer(AbstractLayer):
         
 
     def forward(self):
-        return np.dot(self.weight, self.node) + self.bias
+        node = [None]
+        if len(self.node) != 1:
+            node[0] = np.array([])
+            for i in xrange(len(self.node)):
+                node[0] = np.append(node[0],self.node[i].reshape(np.product(self.node[i].shape)))
+            self.node = node
+
+        elif len(self.node[0].shape) != 1:
+            self.node[0] = self.node[0].reshape(np.product(self.node[0].shape))
+
+        return [np.dot(self.weight, self.node[0]) + self.bias]
             
 
     def back(self,next_node, next_derr):
-
-        self.dbias = next_derr
-        self.dweight = np.outer(next_derr, self.node)
-        self.derr = np.dot(self.weight.T, next_derr)
+        self.dbias = next_derr[0]
+        self.dweight = np.outer(next_derr[0], self.node[0])
+        self.derr[0] = np.dot(self.weight.T, next_derr[0])
 
     def update(self, rate):
         self.weight = self.weight - rate * self.dweight
@@ -129,7 +139,7 @@ class FullyConnectedLayer(AbstractLayer):
 class ActivateLayer(AbstractLayer):
 
     def __init__(self, activate_function='sigmoid'):
-        self.node = None
+        self.node = [None]
 
         if activate_function == 'sigmoid':
             self.ac = lambda x : 1.0 / (1+np.exp(-x))
@@ -155,10 +165,15 @@ class ActivateLayer(AbstractLayer):
             raise NameError(error)
 
     def forward(self):
-        return self.ac(self.node)
+        next_node = self.node
+        for i in xrange(len(next_node)):
+            next_node[i] = self.ac(self.node[i])
+        return next_node
 
     def back(self, next_node, next_derr):
-        self.derr = next_derr * self.dac(next_node)
+        self.derr = next_derr
+        for i in xrange(len(next_node)):
+            self.derr[i] = next_derr[i] * self.dac(next_node[i])
 
     def update(self, rate):
         '''
@@ -168,8 +183,8 @@ class ActivateLayer(AbstractLayer):
 class OutputLayer(AbstractLayer):
 
     def __init__(self):
-        self.node = None
-        self.derr = None
+        self.node = [None]
+        self.derr = [None]
 
     def forward(self):
         error = '''
@@ -179,8 +194,8 @@ class OutputLayer(AbstractLayer):
         raise NameError(error)
 
     def back(self, label_array):
-        self.derr = self.node - label_array
-        err = np.dot(self.derr,self.derr)/2
+        self.derr[0] = self.node[0] - label_array
+        err = np.dot(self.derr[0],self.derr[0])/2
         return err
         
     def update(self, rate):
