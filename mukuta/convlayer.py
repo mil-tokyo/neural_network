@@ -59,6 +59,7 @@ class ReshapeLayer(layer.Layer):
     """convert 2d array to 1d array"""
     def forward(self,ivector):
         self.shape=ivector.shape
+        self.ivector=ivector
         return np.reshape(ivector,np.product(self.shape))
 
     def backward(self,odiff):
