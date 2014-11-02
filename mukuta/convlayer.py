@@ -39,5 +39,40 @@ class ConvLayer(layer.Layer):
     def update(self):
         self.weight=self.diff.update(self.weight)
 
+class MaxPoolLayer(layer.Layer):
+    """max pool"""
+    def __init__(self,patchsize):
+        self.patchsize=patchsize
+
+    def forward(self,ivector):
+        self.ivector=ivector
+        self.osize=[x/z for (x,z) in zip(self.ivector.shape[1:],self.patchsize)]
+        lst=[]
+        for i in range(2):
+            ltmp=[]
+            for j in range(self.patchsize[i]):
+                ltmp.append(range(j,self.ivector.shape[i+1],self.patchsize[i]))
+            lst.append(ltmp)
+        tmp=np.amax(np.array([self.ivector[:,l,:] for l in lst[0]]),axis=0)
+        self.ovector=np.amax(np.array([tmp[:,:,l] for l in lst[1]]),axis=0)
+        self.maxfilter=np.repeat(np.repeat(self.ovector,self.patchsize[0],axis=1),self.patchsize[1],axis=2) <= self.ivector
+        return self.ovector
+
+    def backward(self,odiff):
+        return odiff * self.maxfilter
+
+class ReshapeLayer(layer.Layer):
+    """convert 2d array to 1d array"""
+    def forward(self,ivector):
+        self.shape=ivector.shape
+        return np.reshape(ivector,np.product(self.shape))
+
+    def backward(self,odiff):
+        return np.reshape(odiff,self.shape)
+
+
+
+
+        
 
 
