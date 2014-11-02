@@ -1,6 +1,5 @@
 import numpy as np
-import convlayer
-x=np.random.normal(0,1,(10,25,25))
-cl=convlayer.ConvLayer(10,20,(3,3),(1,1),'Grad')
-cw=cl.weight
+import convnetwork
+x=np.random.normal(0,1,(1,28,28))
+cl=convnetwork.ConvNetwork([(1,28,28),[[(10,5,5),(1,1),(2,2)],[(12,3,3),(1,1),(2,2)]],[128,10]],'ReLU','Grad')
 
