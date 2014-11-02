@@ -2,6 +2,7 @@ import numpy as np
 import grad
 import layer
 import convolve3d
+import convolveback
 
 
 mu=0
@@ -26,11 +27,7 @@ class ConvLayer(layer.Layer):
     def backward(self,odiff):
         dweight=np.zeros(self.weight.shape)
         idiff=np.zeros(self.ivector.shape)
-        for i in range(self.o):
-            for j in range(self.osize[0]):
-                for k in range(self.osize[1]):
-                    dweight[i]+=odiff[i,j,k]*self.ivector[:,self.stepsize[0]*j:self.stepsize[0]*j+self.patchsize[0],self.stepsize[1]*k:self.stepsize[1]*k+self.patchsize[1]]
-                    idiff[:,self.stepsize[0]*j:self.stepsize[0]*j+self.patchsize[0],self.stepsize[1]*k:self.stepsize[1]*k+self.patchsize[1]]+=dweight[i]*odiff[i,j,k]
+        dweight,idiff=convolveback.convolveback(odiff,self.weight,self.ivector,self.o,self.osize[0],self.osize[1],self.stepsize[0],self.stepsize[1])
         self.diff.append(dweight)
         return idiff
     def update(self):
