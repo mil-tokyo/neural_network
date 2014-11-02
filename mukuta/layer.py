@@ -54,7 +54,7 @@ class OutputLayer(Layer):
     """output class vector"""
     def forward(self,ivector):
         self.ivector=ivector
-        expi=np.exp(self.ivector-np.mean(self.ivector))
+        expi=np.exp(self.ivector-np.amax(self.ivector))
         self.ovector=expi/np.sum(expi)
         return self.ovector
 

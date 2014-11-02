@@ -59,7 +59,7 @@ class MaxPoolLayer(layer.Layer):
         return self.ovector
 
     def backward(self,odiff):
-        return odiff * self.maxfilter
+        return np.repeat(np.repeat(odiff,self.patchsize[0],axis=1),self.patchsize[1],axis=2) * self.maxfilter
 
 class ReshapeLayer(layer.Layer):
     """convert 2d array to 1d array"""
