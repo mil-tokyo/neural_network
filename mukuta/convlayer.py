@@ -1,6 +1,7 @@
 import numpy as np
 import grad
 import layer
+import convolve3d
 
 
 mu=0
@@ -19,11 +20,7 @@ class ConvLayer(layer.Layer):
     def forward(self,ivector):
         self.ivector=ivector
         self.osize=[(x-y)/z+1 for (x,y,z) in zip(ivector.shape[1:],self.patchsize,self.stepsize)]
-        self.ovector=np.zeros((self.o,self.osize[0],self.osize[1]))
-        for i in range(self.o):
-            for j in range(self.osize[0]):
-                for k in range(self.osize[1]):
-                    self.ovector[i,j,k]=np.sum(self.weight[i] * ivector[:,self.stepsize[0]*j:self.stepsize[0]*j+self.patchsize[0],self.stepsize[1]*k:self.stepsize[1]*k+self.patchsize[1]])
+        self.ovector=convolve3d.convolve3d(self.ivector,self.weight,self.o,self.osize[0],self.osize[1],self.stepsize[0],self.stepsize[1])
         return self.ovector
 
     def backward(self,odiff):
