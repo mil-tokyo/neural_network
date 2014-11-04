@@ -1,6 +1,7 @@
 import sys,os,struct
 import numpy as np
 from array import array
+import math
 
 def load_mnist(data_path = '/data/ishimochi0/dataset/mnist/'):
     fname_train_img = os.path.join(data_path, 'train-images-idx3-ubyte')
