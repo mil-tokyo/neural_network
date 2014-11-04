@@ -45,7 +45,7 @@ class NeuralNetwork(AbstractNeuralNetwork):
         print_interval = 500
         test_interval = 5000
         print "total epoch : "+str(epoch)
-        seed = [i for i in range(len(self.train_labels))]
+        seed = [i for i in xrange(len(self.train_labels))]
         for k in range(epoch):
             epoch_seed = random.sample(seed,self.batch_size)
             for i in xrange(len(epoch_seed)):
