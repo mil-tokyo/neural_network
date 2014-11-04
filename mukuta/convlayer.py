@@ -6,7 +6,7 @@ import convolveback
 
 
 mu=0
-sigma=1
+sigma=0.1
 
 class ConvLayer(layer.Layer):
     """Convolution Layer"""
