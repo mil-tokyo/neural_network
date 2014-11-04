@@ -54,7 +54,7 @@ class PoolingLayer(AbstractLayer):
         for i in xrange(next_derr.shape[0]):
             self.derr[i,:,:] = self.pos[i,:,:]*np.repeat(np.repeat(next_derr[i,:,:],self.kernel_size,axis=0),self.kernel_size,axis=1)
 
-    def update(self, rate):
+    def update(self, rate, batch_size = 1):
         '''
         nothing to do
         '''
@@ -84,6 +84,7 @@ class ConvolutionalLayer(AbstractLayer):
             self.next_node_size = (self.weight.shape[0],(self.node.shape[1]-self.kernel_size)/self.stride+1,(self.node.shape[2]-self.kernel_size)/self.stride+1)
         if self.bias is None:
             self.bias = np.zeros(self.next_node_size)
+            self.dbias = np.zeros(self.next_node_size)
 
         next_node = np.zeros(self.next_node_size)
         for i in xrange(self.weight.shape[0]):
@@ -99,11 +100,10 @@ class ConvolutionalLayer(AbstractLayer):
 
         for i in xrange(self.weight.shape[0]):
             for j in xrange(self.weight.shape[1]):
-                self.derr[j,:,:] += convolve2d(next_derr[i,:,:],np.rot90(self.weight[i,j,:,:],2),mode='full')
-
+                self.derr[j,:,:] = convolve2d(next_derr[i,:,:],np.rot90(self.weight[i,j,:,:],2),mode='full')
         for i in xrange(next_derr.shape[0]):
             for j in xrange(self.node.shape[0]):
-                self.dweight[i,j,:,:] = np.rot90(convolve2d(self.node[j,:,:],np.rot90(next_derr[i,:,:],2),mode='valid'),2)
+                self.dweight[i,j,:,:] += np.rot90(convolve2d(self.node[j,:,:],np.rot90(next_derr[i,:,:],2),mode='valid'),2)
                 # self.dweight[i,j,:,:] = convolve2d(self.node[j,:,:],next_derr[i,:,:],mode='valid')
 
         
@@ -113,17 +113,19 @@ class ConvolutionalLayer(AbstractLayer):
         # self.derr = np.dot(self.weight.T, next_derr)
         
 
-    def update(self, rate):
+    def update(self, rate, batch_size=1):
+        self.dweight /= batch_size
+        self.dbias /= batch_size
         self.weight = self.weight - rate * self.dweight
         self.bias = self.bias - rate * self.dbias
+        self.dweight = np.zeros(self.dweight.shape)
+        self.dbias = np.zeros(self.dbias.shape)
 
 class FullyConnectedLayer(AbstractLayer):
     def __init__(self, node_num, next_node_num):
         self.node_num = node_num
         self.node = None
         self.grad = None
-        self.dweight = None
-        self.dbias = None
         self.derr = None
 
         '''
@@ -131,6 +133,8 @@ class FullyConnectedLayer(AbstractLayer):
         '''
         self.weight = 2 * np.random.rand(next_node_num, node_num) - 1
         self.bias = np.zeros(next_node_num)
+        self.dweight = np.zeros(self.weight.shape)
+        self.dbias = np.zeros(self.bias.shape)
         print "initialize weight"
         print self.weight.shape
         
@@ -138,17 +142,20 @@ class FullyConnectedLayer(AbstractLayer):
     def forward(self):
         self.node = self.node.reshape(np.product(self.node.shape))
         return np.dot(self.weight, self.node) + self.bias
-            
+
 
     def back(self,next_node, next_derr):
-        self.dbias = next_derr
-        self.dweight = np.outer(next_derr, self.node)
+        self.dbias += next_derr
+        self.dweight += np.outer(next_derr, self.node)
         self.derr = np.dot(self.weight.T, next_derr)
 
-    def update(self, rate):
+    def update(self, rate, batch_size = 1):
+        self.dweight /= batch_size
+        self.dbias /= batch_size
         self.weight = self.weight - rate * self.dweight
         self.bias = self.bias - rate * self.dbias
-        
+        self.dweight = np.zeros(self.dweight.shape)
+        self.dbias = np.zeros(self.dbias.shape)
 
 class ActivateLayer(AbstractLayer):
 
@@ -184,7 +191,7 @@ class ActivateLayer(AbstractLayer):
     def back(self, next_node, next_derr):
         self.derr = next_derr * self.dac(next_node)
 
-    def update(self, rate):
+    def update(self, rate, batch_size=1):
         '''
         nothing
         '''
@@ -207,7 +214,7 @@ class OutputLayer(AbstractLayer):
         err = np.dot(self.derr,self.derr)/2
         return err
         
-    def update(self, rate):
+    def update(self, rate, batch_size=1):
         '''
         nothing
         '''

@@ -7,4 +7,4 @@ import numpy as np
 #nn.test()
 
 cnn = network.convolutional_neural_network.ConvolutionalNeuralNetwork()
-cnn.learn(epoch = 30)
+cnn.learn(epoch = 60000)
