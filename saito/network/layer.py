@@ -107,6 +107,8 @@ class ConvolutionalLayer(AbstractLayer):
                 # self.dweight[i,j,:,:] = convolve2d(self.node[j,:,:],next_derr[i,:,:],mode='valid')
 
         
+
+
         # self.dweight = np.outer(next_derr, self.node)
         # self.derr = np.dot(self.weight.T, next_derr)
         
