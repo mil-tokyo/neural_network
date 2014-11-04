@@ -29,7 +29,9 @@ class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
         self.layers.append(layer.PoolingLayer(kernel_size = 2, stride = 2, pool_type = 'MAX'))
         self.layers.append(layer.ActivateLayer(self.activate_function))
         self.layers.append(layer.FullyConnectedLayer(300,128))
+        self.layers.append(layer.ActivateLayer(self.activate_function))
         self.layers.append(layer.FullyConnectedLayer(128,10))
+        self.layers.append(layer.ActivateLayer('softmax'))
         self.layers.append(layer.OutputLayer())
 
         self.layers_num = len(self.layers)
