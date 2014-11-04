@@ -43,7 +43,7 @@ class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
     def learn(self, epoch=1):
         print "learn start"
         total_error = 0
-        print_interval = 100
+        print_interval = 5000
         print "total epoch : "+str(epoch)
         for k in range(epoch):
             print "epoch : "+str(k+1)

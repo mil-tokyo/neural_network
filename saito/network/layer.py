@@ -73,8 +73,8 @@ class ConvolutionalLayer(AbstractLayer):
         '''
         initialize weight with random
         '''
-        self.weight = np.random.rand(num_output, num_input, kernel_size, kernel_size)
-        self.dweight = np.random.rand(num_output, num_input, kernel_size, kernel_size)
+        self.weight = 2*np.random.rand(num_output, num_input, kernel_size, kernel_size)-1
+        self.dweight = np.zeros((num_output, num_input, kernel_size, kernel_size))
         if self.stride != 1:
             raise NameError("stride except 1 is unsupported")
 
@@ -99,13 +99,12 @@ class ConvolutionalLayer(AbstractLayer):
 
         for i in xrange(self.weight.shape[0]):
             for j in xrange(self.weight.shape[1]):
-                # self.derr[j,:,:] += convolve2d(next_derr[i,:,:],np.rot90(self.weight[i,j,:,:],2),mode='full')
-                self.derr[j,:,:] += convolve2d(next_derr[i,:,:],self.weight[i,j,:,:],mode='full')
+                self.derr[j,:,:] += convolve2d(next_derr[i,:,:],np.rot90(self.weight[i,j,:,:],2),mode='full')
 
         for i in xrange(next_derr.shape[0]):
             for j in xrange(self.node.shape[0]):
-                # self.dweight[i,j,:,:] = np.rot90(convolve2d(self.node[j,:,:],np.rot90(next_derr[i,:,:],2),mode='valid'),2)
-                self.dweight[i,j,:,:] = convolve2d(self.node[j,:,:],next_derr[i,:,:],mode='valid')
+                self.dweight[i,j,:,:] = np.rot90(convolve2d(self.node[j,:,:],np.rot90(next_derr[i,:,:],2),mode='valid'),2)
+                # self.dweight[i,j,:,:] = convolve2d(self.node[j,:,:],next_derr[i,:,:],mode='valid')
 
         
 
