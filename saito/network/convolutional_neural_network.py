@@ -4,7 +4,7 @@ import layer
 
 class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
 
-    def __init__(self, batch_size = 120):
+    def __init__(self):
         print "initializing network"
 
         self.load_config()
@@ -14,21 +14,22 @@ class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
         #self.load_mnist('/data/ishimochi0/dataset/mnist')
         
         #print self.train_labels
-        self.num_unit_of_each_layer = num_unit_of_each_layer
         self.layers = []
         self.rate = 0.05
         self.activate_function = 'sigmoid'
-        fc_num = len(num_unit_of_each_layer)
+        
 
         '''
         initialize layers
         '''
-        for i in range(fc_num-2):
-            self.layers.append(layer.FullyConnectedLayer(num_unit_of_each_layer[i], num_unit_of_each_layer[i+1]))
-            self.layers.append(layer.ActivateLayer(self.activate_function))
-
-        self.layers.append(layer.FullyConnectedLayer(num_unit_of_each_layer[fc_num-2], num_unit_of_each_layer[fc_num-1]))
-        self.layers.append(layer.ActivateLayer('softmax'))
+        self.layers.append(layer.ConvolutionalLayer(num_input = 1,num_output = 10,kernel_size = 5,stride = 1))
+        self.layers.append(layer.PoolingLayer(kernel_size = 2, stride = 2, pool_type = 'MAX'))
+        self.layers.append(layer.ActivateLayer(self.activate_function))
+        self.layers.append(layer.ConvolutionalLayer(num_input = 10,num_output = 12,kernel_size = 3,stride = 1))
+        self.layers.append(layer.PoolingLayer(kernel_size = 2, stride = 2, pool_type = 'MAX'))
+        self.layers.append(layer.ActivateLayer(self.activate_function))
+        self.layers.append(layer.FullyConnectedLayer(300,128))
+        self.layers.append(layer.FullyConnectedLayer(128,10))
         self.layers.append(layer.OutputLayer())
 
         self.layers_num = len(self.layers)
@@ -40,7 +41,7 @@ class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
     def learn(self, epoch=1):
         print "learn start"
         total_error = 0
-        print_interval = 5000
+        print_interval = 100
         print "total epoch : "+str(epoch)
         for k in range(epoch):
             print "epoch : "+str(k+1)

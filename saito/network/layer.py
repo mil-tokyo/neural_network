@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 from scipy.signal import convolve2d
+from scipy.signal import convolve
 
 def generate_layer():
     '''
@@ -18,39 +19,40 @@ class PoolingLayer(AbstractLayer):
         self.pool_type = pool_type
         self.derr = None
         self.max_pos = None
+        self.next_node_size = None
         '''
         initialize weight with random
         '''        
 
     def forward(self):
-        next_node = self.node
-        self.max_pos = self.node
+        if self.next_node_size is None:
+            self.next_node_size = (self.node.shape[0],(self.node.shape[1]-2)/self.stride+1, (self.node.shape[2]-2)/self.stride+1)
+
+        next_node =np.zeros(self.next_node_size)
+        self.pos = np.zeros(self.node.shape)
+
         for i in xrange(len(self.node)):
-            next_node[i], self.max_pos[i] = self.pool2d(self.node[i])
+            next_node[i,:,:], self.pos[i,:,:] = self.pool2d(self.node[i,:,:])
         return next_node
 
     def pool2d(self, node):
         vertical = (node.shape[0] - self.kernel_size)/self.stride+1
         horizontal = (node.shape[1] - self.kernel_size)/self.stride+1
         max_value = np.zeros((vertical, horizontal))
-        max_pos = np.zeros((vertical, horizontal))
+        pos = np.zeros((node.shape[0],node.shape[1]))
+
         for i in xrange(vertical):
             for j in xrange(horizontal):
                 max_value[i,j] = np.max(node[i*self.stride:i*self.stride+self.kernel_size,j*self.stride:j*self.stride+self.kernel_size])
-                max_pos[i,j] = np.argmax(node[i*self.stride:i*self.stride+self.kernel_size,j*self.stride:j*self.stride+self.kernel_size])
-                
-        return max_value, max_pos
+                argmax = np.argmax(node[i*self.stride:i*self.stride+self.kernel_size,j*self.stride:j*self.stride+self.kernel_size])
+                pos[i*self.stride+argmax/self.kernel_size,j*self.stride+argmax%self.kernel_size] += 1
+        return max_value, pos
 
     def back(self,next_node=None,next_derr=None):
-        self.derr = self.node
-        for i in xrange(len(next_derr)):
-            self.derr[i] = poolback2d(next_derr[i], self.max_pos[i])
-
-    def poolback2d(self, next_derr, max_pos):
-        derr = np.zeros(self.node[0].shape)
+        next_derr = next_derr.reshape(self.next_node_size)
+        self.derr = np.zeros(self.node.shape)
         for i in xrange(next_derr.shape[0]):
-            for j in xrange(next_derr.shape[1]):
-                derr[i*self.stride+max_pos[i,j]/self.kernel_size,j*self.stride+max_pos[i,j]/self.kernel_size*self.kernel_size]+=next_derr[i,j]
+            self.derr[i,:,:] = self.pos[i,:,:]*np.repeat(np.repeat(next_derr[i,:,:],self.kernel_size,axis=0),self.kernel_size,axis=1)
 
     def update(self, rate):
         '''
@@ -58,38 +60,57 @@ class PoolingLayer(AbstractLayer):
         '''
 
 class ConvolutionalLayer(AbstractLayer):
-    def __init__(self, num_input, num_output, kernel_size = 5, stride = 1):
+    def __init__(self, num_input, num_output, kernel_size = 5, stride = 1, connection = None):
         self.num_output = num_output
         self.num_input = num_input
         self.kernel_size = kernel_size
         self.stride = stride
         self.node = None
         self.derr = None
+        self.bias = None
+        self.dbias = None
+        self.next_node_size = None
         '''
         initialize weight with random
         '''
-        self.weight = []
-        self.dweight = []
-        for i in xrange(num_output):
-            self.weight.append(2*np.random.rand(kernel_size,kernel_size)-1)
-            self.dweight.append(np.zeros((kernel_size,kernel_size)))
-
-    def forward(self):
+        self.weight = np.random.rand(num_output, num_input, kernel_size, kernel_size)
+        self.dweight = np.random.rand(num_output, num_input, kernel_size, kernel_size)
         if self.stride != 1:
             raise NameError("stride except 1 is unsupported")
-        next_node = []
-        for i in xrange(len(self.weight)):
-            next_node.append(convolve2d(self.node[0],self.weight[i],mode='valid'))
-            for j in xrange(1,len(self.node)):
-                next_node[i] += convolve2d(self.node[j],self.weight[i],mode='valid')
+
+
+    def forward(self):
+        if self.next_node_size is None:
+            self.next_node_size = (self.weight.shape[0],(self.node.shape[1]-self.kernel_size)/self.stride+1,(self.node.shape[2]-self.kernel_size)/self.stride+1)
+        if self.bias is None:
+            self.bias = np.zeros(self.next_node_size)
+
+        next_node = np.zeros(self.next_node_size)
+        for i in xrange(self.weight.shape[0]):
+            for j in xrange(self.weight.shape[1]):
+                next_node[i,:,:] = next_node[i,:,:] + convolve2d(self.node[j,:,:],self.weight[i,j,:,:],mode='valid')
         return next_node
-            
 
     def back(self,next_node, next_derr):
-
         self.dbias = next_derr
-        self.dweight = np.outer(next_derr, self.node)
-        self.derr = np.dot(self.weight.T, next_derr)
+        self.derr = np.zeros(self.node.shape)
+        self.dweight = np.zeros(self.dweight.shape)
+        next_derr = next_derr.reshape(self.next_node_size)
+
+        for i in xrange(self.weight.shape[0]):
+            for j in xrange(self.weight.shape[1]):
+                self.derr[j,:,:] += convolve2d(next_derr[i,:,:],np.rot90(self.weight[i,j,:,:],2),mode='full')
+        for i in xrange(next_derr.shape[0]):
+            for j in xrange(self.node.shape[0]):
+                self.dweight[i,j,:,:] = np.rot90(convolve2d(self.node[j,:,:],np.rot90(next_derr[i,:,:],2),mode='valid'),2)
+
+        print 'node'
+        print self.node
+        exit()
+        
+        # self.dweight = np.outer(next_derr, self.node)
+        # self.derr = np.dot(self.weight.T, next_derr)
+        
 
     def update(self, rate):
         self.weight = self.weight - rate * self.dweight
@@ -98,11 +119,11 @@ class ConvolutionalLayer(AbstractLayer):
 class FullyConnectedLayer(AbstractLayer):
     def __init__(self, node_num, next_node_num):
         self.node_num = node_num
-        self.node = [None]
+        self.node = None
         self.grad = None
         self.dweight = None
         self.dbias = None
-        self.derr = [None]
+        self.derr = None
 
         '''
         initialize weight with random
@@ -114,23 +135,14 @@ class FullyConnectedLayer(AbstractLayer):
         
 
     def forward(self):
-        node = [None]
-        if len(self.node) != 1:
-            node[0] = np.array([])
-            for i in xrange(len(self.node)):
-                node[0] = np.append(node[0],self.node[i].reshape(np.product(self.node[i].shape)))
-            self.node = node
-
-        elif len(self.node[0].shape) != 1:
-            self.node[0] = self.node[0].reshape(np.product(self.node[0].shape))
-
-        return [np.dot(self.weight, self.node[0]) + self.bias]
+        self.node = self.node.reshape(np.product(self.node.shape))
+        return np.dot(self.weight, self.node) + self.bias
             
 
     def back(self,next_node, next_derr):
-        self.dbias = next_derr[0]
-        self.dweight = np.outer(next_derr[0], self.node[0])
-        self.derr[0] = np.dot(self.weight.T, next_derr[0])
+        self.dbias = next_derr
+        self.dweight = np.outer(next_derr, self.node)
+        self.derr = np.dot(self.weight.T, next_derr)
 
     def update(self, rate):
         self.weight = self.weight - rate * self.dweight
@@ -165,15 +177,10 @@ class ActivateLayer(AbstractLayer):
             raise NameError(error)
 
     def forward(self):
-        next_node = self.node
-        for i in xrange(len(next_node)):
-            next_node[i] = self.ac(self.node[i])
-        return next_node
+        return self.ac(self.node)
 
     def back(self, next_node, next_derr):
-        self.derr = next_derr
-        for i in xrange(len(next_node)):
-            self.derr[i] = next_derr[i] * self.dac(next_node[i])
+        self.derr = next_derr * self.dac(next_node)
 
     def update(self, rate):
         '''
@@ -183,8 +190,8 @@ class ActivateLayer(AbstractLayer):
 class OutputLayer(AbstractLayer):
 
     def __init__(self):
-        self.node = [None]
-        self.derr = [None]
+        self.node = None
+        self.derr = None
 
     def forward(self):
         error = '''
@@ -194,8 +201,8 @@ class OutputLayer(AbstractLayer):
         raise NameError(error)
 
     def back(self, label_array):
-        self.derr[0] = self.node[0] - label_array
-        err = np.dot(self.derr[0],self.derr[0])/2
+        self.derr = self.node - label_array
+        err = np.dot(self.derr,self.derr)/2
         return err
         
     def update(self, rate):

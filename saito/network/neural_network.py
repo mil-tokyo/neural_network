@@ -49,7 +49,7 @@ class NeuralNetwork(AbstractNeuralNetwork):
                     print str(i+1)+" images learned   ,  ",
 
                 # go forward
-                self.layers[0].node = [self.train_images[i]]
+                self.layers[0].node = self.train_images[i]
                 for j in xrange(self.layers_num-1):
                     self.layers[j+1].node = self.layers[j].forward()
 
@@ -78,11 +78,11 @@ class NeuralNetwork(AbstractNeuralNetwork):
 #            if i % 100 == 0:
 #                print str(i)+" images tested"
             # go forward
-            self.layers[0].node = [self.test_images[i]]
+            self.layers[0].node = self.test_images[i]
             for j in xrange(self.layers_num-1):
                 self.layers[j+1].node = self.layers[j].forward()
 
-            out = self.layers[self.layers_num-1].node[0]
+            out = self.layers[self.layers_num-1].node
 #            if i % 100 == 0:
 #                print out
 #                print self.test_labels[i]

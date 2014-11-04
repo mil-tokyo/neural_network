@@ -55,6 +55,12 @@ def load_mnist(data_path = '/data/ishimochi0/dataset/mnist/'):
     test_images = test_images / 255.0
     train_images = train_images / 255.0
 
+    # resize images to 2D
+    dsize = int(math.sqrt(len(train_images[0])))
+    train_images = train_images.reshape(len(train_images),1,dsize,dsize)
+    dsize = int(math.sqrt(len(test_images[0])))
+    test_images = test_images.reshape(len(test_images),1,dsize,dsize)
+
     test_labels = np.fromfunction(lambda i,j:j==test_labels[i],(test_labels.size,10),dtype=int)+0
     train_labels = np.fromfunction(lambda i,j:j==train_labels[i],(train_labels.size,10),dtype=int)+0
 
