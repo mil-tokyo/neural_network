@@ -23,14 +23,16 @@ class AbstractNeuralNetwork(object):
         train_set, valid_set, test_set=cPickle.load(f)
         train_images, train_labels=train_set
         test_images, test_labels=test_set
-#        dsize = int(math.sqrt(len(train_images[0])))
-#        train_images = train_images.reshape(len(train_images),dsize,dsize)
-#        dsize = int(math.sqrt(len(test_images[0])))
-#        test_images = test_images.reshape(len(test_images),dsize,dsize)
+        dsize = int(math.sqrt(len(train_images[0])))
+        train_images = train_images.reshape(len(train_images),1,dsize,dsize)
+        dsize = int(math.sqrt(len(test_images[0])))
+        test_images = test_images.reshape(len(test_images),1,dsize,dsize)
+
         self.train_images = train_images
-        self.train_labels = train_labels
+        self.train_labels = np.fromfunction(lambda i,j:j==train_labels[i],(train_labels.size,max(train_labels)+1),dtype=int)+0
         self.test_images = test_images
         self.test_labels = test_labels
+        self.test_labels = np.fromfunction(lambda i,j:j==test_labels[i],(test_labels.size,max(test_labels)+1),dtype=int)+0
 
     def load_mnist(self, data_path):
         fname_train_img = os.path.join(data_path, 'train-images-idx3-ubyte')
@@ -81,13 +83,20 @@ class AbstractNeuralNetwork(object):
         for i in range(len(ind)):
             train_images[i] = np.array(train_img[ ind[i]*rows*cols : (ind[i]+1)*rows*cols ])
             train_labels[i] = train_lbl[ind[i]]
-        
+
         test_images = test_images / 255.0
         train_images = train_images / 255.0
+
+        # resize images to 2D
+        dsize = int(math.sqrt(len(train_images[0])))
+        train_images = train_images.reshape(len(train_images),1,dsize,dsize)
+        dsize = int(math.sqrt(len(test_images[0])))
+        test_images = test_images.reshape(len(test_images),1,dsize,dsize)
+
         self.test_images = test_images
-        self.test_labels = test_labels
+        self.test_labels = np.fromfunction(lambda i,j:j==test_labels[i],(test_labels.size,max(test_labels)+1),dtype=int)+0
         self.train_images = train_images
-        self.train_labels = train_labels
+        self.train_labels = np.fromfunction(lambda i,j:j==train_labels[i],(train_labels.size,max(train_labels)+1),dtype=int)+0
 
 
         # for i in range(data_index,data_index+1):
