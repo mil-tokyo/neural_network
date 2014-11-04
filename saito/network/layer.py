@@ -73,8 +73,8 @@ class ConvolutionalLayer(AbstractLayer):
         '''
         initialize weight with random
         '''
-        self.weight = np.random.rand(num_output, num_input, kernel_size, kernel_size)
-        self.dweight = np.random.rand(num_output, num_input, kernel_size, kernel_size)
+        self.weight = 2*np.random.rand(num_output, num_input, kernel_size, kernel_size)-1
+        self.dweight = np.zeros((num_output, num_input, kernel_size, kernel_size))
         if self.stride != 1:
             raise NameError("stride except 1 is unsupported")
 
