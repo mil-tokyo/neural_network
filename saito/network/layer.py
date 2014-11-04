@@ -119,8 +119,6 @@ class FullyConnectedLayer(AbstractLayer):
         self.node_num = node_num
         self.node = None
         self.grad = None
-        self.dweight = None
-        self.dbias = None
         self.derr = None
 
         '''
@@ -128,6 +126,8 @@ class FullyConnectedLayer(AbstractLayer):
         '''
         self.weight = 2 * np.random.rand(next_node_num, node_num) - 1
         self.bias = np.zeros(next_node_num)
+        self.dweight = np.zeros(self.weight.shape)
+        self.dbias = np.zeros(self.bias.shape)
         print "initialize weight"
         print self.weight.shape
         
@@ -135,17 +135,20 @@ class FullyConnectedLayer(AbstractLayer):
     def forward(self):
         self.node = self.node.reshape(np.product(self.node.shape))
         return np.dot(self.weight, self.node) + self.bias
-            
+
 
     def back(self,next_node, next_derr):
-        self.dbias = next_derr
-        self.dweight = np.outer(next_derr, self.node)
+        self.dbias += next_derr
+        self.dweight += np.outer(next_derr, self.node)
         self.derr = np.dot(self.weight.T, next_derr)
 
-    def update(self, rate):
+    def update(self, rate, batch_size = 1):
+        self.dweight /= batch_size
+        self.dbias /= batch_size
         self.weight = self.weight - rate * self.dweight
         self.bias = self.bias - rate * self.dbias
-        
+        self.dweight = np.zeros(self.dweight.shape)
+        self.dbias = np.zeros(self.dbias.shape)
 
 class ActivateLayer(AbstractLayer):
 
@@ -181,7 +184,7 @@ class ActivateLayer(AbstractLayer):
     def back(self, next_node, next_derr):
         self.derr = next_derr * self.dac(next_node)
 
-    def update(self, rate):
+    def update(self, rate, batch_size):
         '''
         nothing
         '''
@@ -204,7 +207,7 @@ class OutputLayer(AbstractLayer):
         err = np.dot(self.derr,self.derr)/2
         return err
         
-    def update(self, rate):
+    def update(self, rate, batch_size):
         '''
         nothing
         '''
