@@ -145,6 +145,7 @@ class FullyConnectedLayer(AbstractLayer):
     def update(self, rate):
         self.weight = self.weight - rate * self.dweight
         self.bias = self.bias - rate * self.dbias
+        
 
 class ActivateLayer(AbstractLayer):
 
