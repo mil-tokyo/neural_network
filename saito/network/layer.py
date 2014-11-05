@@ -88,8 +88,9 @@ class ConvolutionalLayer(AbstractLayer):
 
         next_node = np.zeros(self.next_node_size)
         for i in xrange(self.weight.shape[0]):
-            for j in xrange(self.weight.shape[1]):
-                next_node[i,:,:] = next_node[i,:,:] + convolve2d(self.node[j,:,:],self.weight[i,j,:,:],mode='valid')
+            next_node[i,:,:] = convolve(self.node, self.weight[i,:,:,:],mode='valid')
+            # for j in xrange(self.weight.shape[1]):
+            #     next_node[i,:,:] = next_node[i,:,:] + convolve2d(self.node[j,:,:],self.weight[i,j,:,:],mode='valid')
         return next_node
 
     def back(self,next_node, next_derr):
@@ -98,15 +99,18 @@ class ConvolutionalLayer(AbstractLayer):
         self.dweight = np.zeros(self.dweight.shape)
         next_derr = next_derr.reshape(self.next_node_size)
 
+        # next_derr_with_zero = np.zeros((self.next_node_size[0], self.next_node_size[1]+2*(self.weight.shape[2]-1), self.next_node_size[2]+2*(self.weight.shape[3]-1)))
+        # next_derr_with_zero[:,self.weight.shape[2]-1:self.weight.shape[2]-1+self.next_node_size[1],self.weight.shape[3]-1:self.weight.shape[3]-1+self.next_node_size[2]] = next_derr
         for i in xrange(self.weight.shape[0]):
             for j in xrange(self.weight.shape[1]):
-                self.derr[j,:,:] = convolve2d(next_derr[i,:,:],np.rot90(self.weight[i,j,:,:],2),mode='full')
+                self.derr[j,:,:] += convolve2d(next_derr[i,:,:],np.rot90(self.weight[i,j,:,:],2),mode='full')
+
+        # for i in xrange(self.weight.shape[1]):
+        #     self.derr[i] = convolve(next_derr_with_zero, np.rot90(self.weight[:,i,:,:], 2),mode='val')
+
         for i in xrange(next_derr.shape[0]):
             for j in xrange(self.node.shape[0]):
-                self.dweight[i,j,:,:] += np.rot90(convolve2d(self.node[j,:,:],np.rot90(next_derr[i,:,:],2),mode='valid'),2)
-                # self.dweight[i,j,:,:] = convolve2d(self.node[j,:,:],next_derr[i,:,:],mode='valid')
-
-        
+                self.dweight[i,j,:,:] += np.rot90(convolve2d(self.node[j,:,:],np.rot90(next_derr[i,:,:],2),mode='valid'),2)        
 
 
         # self.dweight = np.outer(next_derr, self.node)
@@ -213,7 +217,7 @@ class OutputLayer(AbstractLayer):
         self.derr = self.node - label_array
         err = np.dot(self.derr,self.derr)/2
         return err
-        
+
     def update(self, rate, batch_size=1):
         '''
         nothing

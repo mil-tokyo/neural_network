@@ -44,7 +44,7 @@ class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
     def learn(self, epoch=1):
         print "learn start"
         total_error = 0
-        print_interval = 50000
+        print_interval = 1000
         test_interval = 50000
         print "total epoch : "+str(epoch)
         seed = [i for i in xrange(len(self.train_labels))]
