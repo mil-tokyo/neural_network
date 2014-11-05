@@ -21,6 +21,6 @@ def convolveback(np.ndarray[np.float_t,ndim=3] odiff,np.ndarray[np.float_t,ndim=
                     for pj in range(pjmax):
                         for pk in range(pkmax):
                             dweight[i,l,pj,pk]+=odiff[i,j,k]*ivector[l,sj*j+pj,sk*k+pk]
-                            idiff[l,sj*j+pj,sk*k+pk]+=dweight[i,l,pj,pk]*odiff[i,j,k]
+                            idiff[l,sj*j+pj,sk*k+pk]+=weight[i,l,pj,pk]*odiff[i,j,k]
     return dweight,idiff
 

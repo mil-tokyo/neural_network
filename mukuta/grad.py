@@ -2,7 +2,7 @@ import numpy as np
 
 
 
-learnparam=0.1
+learnparam=0.01
         
 class Gradient:
     """Gradient Descent"""
