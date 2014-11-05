@@ -4,7 +4,7 @@ import grad
 
 
 mu=0
-sigma=1
+sigma=0.1
 
 class Layer:
     def update(self):

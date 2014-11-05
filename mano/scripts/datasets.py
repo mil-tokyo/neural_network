@@ -6,9 +6,48 @@
 import os
 import numpy as np
 from PIL import Image
-from tensors import Tensor
 
-class MNIST(object):
+class Dataset(object):
+    """ base dataset class """
+    def __init__(self):
+        pass
+    def create_batch_input(self, batchSize):
+        # choose indice
+        if self.batchInd + batchSize < self.dataNum:
+            lastInd = self.batchInd + batchSize
+            imageIndice = range(self.batchInd, lastInd)
+        else:
+            lastInd = self.batchInd + batchSize - self.dataNum
+            imageIndice = range(self.batchInd, self.dataNum) + range(lastInd)
+        self.batchInd = lastInd
+        # create input tensor
+        feat = np.empty(shape=(batchSize, self.inputChannel, self.inputRow, self.inputCol))
+        target = np.zeros(shape=(batchSize, self.classNum))
+        for batchIndex, imageIndex in enumerate(imageIndice):
+            im = np.asarray(Image.open(self.dataPair[imageIndex][0]))
+            newIm = np.empty(shape=(self.inputChannel, self.inputRow, self.inputCol))
+            for color in xrange(self.inputChannel):
+                newIm[color,:,:] = im[:,:,color] if self.flagColorChannel else im[:,:]
+            feat[batchIndex,:,:,:] =  newIm
+            target[batchIndex, self.dataPair[imageIndex][1]] = 1.0 ## 1-of-K representation
+        if self.flagNorm: feat = self.global_contrast_normalization(feat) ## to be changed
+        return feat, target
+    # resize image
+    def resize_image(self, image): ## TODO
+        pass
+    # gcn by each image patch
+    def global_contrast_normalization(self, feat):
+        for batch in xrange(feat.shape[0]):
+            for channel in xrange(feat.shape[1]):
+                im = feat[batch, channel, :, :]
+                feat[batch, channel, :, :] = (im-im.mean()) / np.sqrt(im.var()+10)
+        return feat
+    # zca whitening
+    def zca_whitening(self): ## TODO
+        pass
+
+
+class MNIST(Dataset):
     """ MNIST dataset class """
     def __init__(self, setting):
         imageDir, labelDir, inputSize, classNum, flagNorm, flagWhite = setting
@@ -17,51 +56,16 @@ class MNIST(object):
         fileNumbers = [int((path.split('/')[-1]).split('.')[0]) for path in paths]
         with open(labelDir, 'r') as f:
             labels = [int(label.replace('\n','')) for label in f]
-        self.dataPair = dict( [ (fileNumber, (paths[i], labels[i])) for i, fileNumber in enumerate(fileNumbers) ] )
+        self.dataPair = dict( [ (fileNumber-1, (paths[i], labels[fileNumber-1])) for i, fileNumber in enumerate(fileNumbers) ] )
         self.dataNum = len(paths)
+        self.batchInd = 0
         # image params
         im = np.asarray(Image.open(paths[0]))
         self.inputRow, self.inputCol = inputSize
         self.classNum = classNum
         self.flagColorChannel = False if len(im.shape) == 2 else True
         self.inputChannel = im.shape[2] if self.flagColorChannel else 1
-        self.flagResize = False if inputSize == im.shape[:2] else True
-        self.flagNorm = flagNorm ## to be changed
         # pre-processing ## TODO
-        #if self.flagNorm: self.global_contrast_normalization()
-        #if self.flagWhite: self.zca_whitening()
-        #if self.flagResize: im = self.resize_image(im)
-
-    def create_batch_input(self, batchSize):
-        # randomly choose indice
-        imageIndice = np.random.random_integers(1, self.dataNum, batchSize)
-        # create input tensor
-        feat = Tensor(batchSize, self.inputChannel, self.inputRow, self.inputCol)
-        target = np.zeros(shape=(batchSize, self.classNum))
-        for batchIndex, imageIndex in enumerate(imageIndice):
-            im = np.asarray(Image.open(self.dataPair[imageIndex][0]))
-            if self.flagNorm: im = self.global_contrast_normalization(im) ## to be changed
-            newIm = np.zeros(shape=(self.inputChannel, self.inputRow, self.inputCol))
-            for color in xrange(self.inputChannel):
-                newIm[color,:,:] = im[:,:,color] if self.flagColorChannel else im[:,:]
-            feat.set_image(batchIndex, newIm)
-            target[batchIndex,:][self.dataPair[imageIndex][1]] = 1.0 # 1-of-K representation
-        return feat.get_value(), target
-
-    ## TO DO
-    def resize_image(self, image):
-        pass
-    """
-    def global_contrast_normalization(self, input):
-        inputMean = np.apply_along_axis(np.mean, 0, input)
-        inputMeanSub = input - inputMean
-        print inputMeanSub[:10]
-        inputVar = np.apply_along_axis(np.linalg.norm, 0, inputMeanSub)
-        print inputVar[:10]
-        return inputMeanSub / inputVar
-    """
-    def global_contrast_normalization(self, input):
-        return input / float(np.sum(input * input))
-
-    def zca_whitening(self):
-        pass
+        self.flagResize = False if inputSize == im.shape[:2] else True ## to be changed
+        self.flagNorm = flagNorm ## to be changed
+        self.flagWhite = flagWhite ## to be changed
