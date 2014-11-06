@@ -1,0 +1,14 @@
+import numpy as np
+from theano import tensor, function
+
+
+class Tensor:
+
+    def __init__(self, channel, row, col, batch):
+        self.channel = channel
+        self.row = row
+        self.col = col
+        self.batch = batch
+
+        self.val = np.array(shape=(channel, row, col, batch))
+        self.t = tensor.ftensor4('t')

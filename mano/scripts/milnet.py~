@@ -1,0 +1,17 @@
+
+
+
+
+class Setting:
+    def __init__(self):
+        print 'hoge'
+
+
+        set_param(self, name=None, prev=None, next=None, dropout=.0, stride=1, actType='ReLU', poolType='Average'):
+
+
+
+
+    def set_param(self, **kargw):
+        for key, val in kargw.iteritems():
+            setattr(self, key, val)

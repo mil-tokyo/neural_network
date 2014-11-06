@@ -1,0 +1,12 @@
+
+from tensors import Tensor
+
+class MNIST(Tensor):
+      def __init__(self, image_dir, label_dir):
+        paths = [os.path.join(root,file) for (root,dirs,files) in os.walk(image_dir) for file in files]
+        with open(label_dir, 'r') as f:
+            labels = [label.replace('\n','') for label in f]
+
+
+    def choose_batch(self, ):
+
