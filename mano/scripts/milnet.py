@@ -30,23 +30,34 @@ class Setting(object):
         self.zcaWhitening= False
 
     def learning_setting(self, mode):
-        self.iteration = 1
-        self.learningRatio = 0.001
-        self.batchSize = 128 if mode=='train' else 9999
+        self.iteration = 50 if mode=='train' else 10
+        self.learningRatio = 0.05
+        self.batchSize = 10 if mode=='train' else 100
         self.lossFunc = 'mean_squared_error'
+        self.printTiming = 10 if mode=='train' else 2
+        self.weightSavePath = '/Users/manopin/data/tmp/'
 
     def layer_setting(self):
-        """ Examples
-        cf. data = np.array(shape(batchSize, channels, heigth, width))
-        fc1 = self.set_params(layeyType='FullyConnected', name='fc1', prev=['input'], next=['act1'], elements=(1024, 1024), dropout=.0) # input_layer, output_layer
-        act1 = self.set_params(layerType='Activation', name='act1', prev=['fc1'], next=['fc2'], actType='tanh') # tanh, sigmoid, relu, identity, softmax
-        conv1 = self.set_params(layerType='Convolution', name='conv1', prev=[None], next=['act1'], elements=(128, 192, 7, 7), stride=2) # channel_in, channel_out, row, col
-        pool1 = self.set_params(layerType='Pooling', name='act1', prev=['conv1'], next=['conv2'], patch=(5,5), stride=2, poolType='max') # max, mean """
-
+        """
+        # 3 layer NN
         self.layers = [
             FC(name='fc1', prev=['input'], next=['act1'], elements=(np.prod(self.inputSize), 100), dropRatio=.0),
             Act(name='act1', prev=['fc1'], next=['fc2'], actType='tanh'),
             FC(name='fc2', prev=['act1'], next=['act2'], elements=(100, self.classNum), dropRatio=.0),
             Act(name='act2', prev=['fc2'], next=['output'], actType='softmax')
             ]
+        """
 
+        # 4 layer conv
+        self.layers = [
+            Conv(name='conv1', prev=['input'], next=['pool1'], elements=(10, 1, 5, 5), stride=1),
+            Pool(name='pool1', prev=['conv1'], next=['act1'], patch=(2,2), stride=2, poolType='max', flagLinkFC=False),
+            Act(name='act1', prev=['pool1'], next=['conv2'], actType='tanh'),
+            Conv(name='conv2', prev=['act1'], next=['pool2'], elements=(12, 10, 3, 3), stride=1),
+            Pool(name='pool2', prev=['conv2'], next=['act2'], patch=(2,2), stride=2, poolType='max', flagLinkFC=True),
+            Act(name='act2', prev=['pool2'], next=['fc1'], actType='tanh'),
+            FC(name='fc1', prev=['act2'], next=['act3'], elements=(300, 128), dropRatio=.0),
+            Act(name='act3', prev=['fc1'], next=['fc2'], actType='tanh'),
+            FC(name='fc2', prev=['act3'], next=['act4'], elements=(128, 10), dropRatio=.0),
+            Act(name='act4', prev=['fc2'], next=['output'], actType='softmax')
+            ]

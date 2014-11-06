@@ -4,7 +4,7 @@ import grad
 
 
 mu=0
-sigma=1
+sigma=0.1
 
 class Layer:
     def update(self):
@@ -38,7 +38,7 @@ class TanhLayer(Layer):
         return self.ovector
 
     def backward(self,odiff):
-        return odiff * (self.ovector+1)/2
+        return odiff * (1-self.ovector**2)/2
 
 class ReLULayer(Layer):
     """apply ReLU to linear output"""
@@ -54,7 +54,7 @@ class OutputLayer(Layer):
     """output class vector"""
     def forward(self,ivector):
         self.ivector=ivector
-        expi=np.exp(self.ivector-np.mean(self.ivector))
+        expi=np.exp(self.ivector-np.amax(self.ivector))
         self.ovector=expi/np.sum(expi)
         return self.ovector
 
