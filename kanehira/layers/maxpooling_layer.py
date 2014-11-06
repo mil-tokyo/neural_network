@@ -19,7 +19,8 @@ class MaxPooling():
                                    x * self.window_size : (x + 1) * self.window_size]
                 output[:, x, y] = np.max(np.max(patch, axis = 1), axis = 1)
                 for i in xrange(input_kernel_size):
-                    max_index = np.argmax(patch[i, :, :])
+                    sub_patch = patch[i, :, :]
+                    max_index = np.where(sub_patch == np.max(sub_patch))
                     self.max_index_map[i,  y * self.window_size : (y + 1) * self.window_size,\
                                    x * self.window_size : (x + 1)* self.window_size ][ max_index ] = 1
 
