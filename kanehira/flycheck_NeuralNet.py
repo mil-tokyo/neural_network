@@ -1,4 +1,7 @@
 import numpy as np
+import sys
+sys.path.append("../saito/")
+import toolbox
 
 class FCLayer:
     def __init__(self, h, W,mode):
@@ -118,14 +121,14 @@ def main():
     lb = preprocessing.LabelBinarizer()
     label = lb.fit_transform(dataset.target)
 
-    train_data, test_data, train_label, test_label = train_test_split(data, label, test_size=0.10)
+#    train_data, test_data, train_label, test_label = train_test_split(data, label, test_size=0.10)
+    train_data, train_label, test_data, test_label = toolbox.load_mnist()
     train_data = np.hstack((np.ones((train_data.shape[0], 1)), train_data))
     test_data = np.hstack((np.ones((test_data.shape[0], 1)), test_data))
 
     inp_dim = train_data.shape[1]
     label_dim = label.shape[1]
     print label
-
 
     ## network setting ##
     setting = {"layer_settings":[inp_dim,128,label_dim],
@@ -136,11 +139,10 @@ def main():
     neuralnet = NeuralNetwork(setting)
 
     ## train Network ##
-    nn.train(train_data, train_label)
+    neuralnet.train(train_data, train_label)
 
     ## predict ##
     result = NN.predict(test_data, label_dim)
     print classification_report(test_label, result)
 if __name__ == "__main__":
     main()
-    
