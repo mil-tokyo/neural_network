@@ -1,8 +1,10 @@
 import numpy as np
+import scipy.signal
 
 class Layer(object):
     _child = None
     _parent = None
+    _units = None
 
     def __init__(self, _shape, _lr = 0.1):
         self._units = np.empty(_shape)
@@ -64,6 +66,10 @@ class Layer(object):
     def setActivationFuncDiff(self, _func):
         self._activation_func_diff = _func
 
+
+    def getUnits(self):
+        return self._units
+
     @staticmethod
     def tanhDiff(_input):
         return 1.0 / np.square(np.cosh(_input))
@@ -76,3 +82,12 @@ class Layer(object):
     def sigmoidDiff(_input, _alpha = 1.0):
         s = Layer.sigmoid(_input, _alpha)
         return s * (1-s)
+
+
+    @staticmethod
+    def convConvForward(weights, prev_units, next_shape):
+        next_units = np.zeros(next_shape)
+        for i in range(0, prev_units.shape[0]):
+            next_units[i] = scipy.signal.convolve(prev_units, weights[:,i,:,:], 'valid')
+
+        return next_units

@@ -17,5 +17,5 @@ class FullyConnectedLayer(Layer):
         self._initWeights((self._length, self._child.getLength()))
         return self._child
 
-    def getUnits(self):
-        return self._units
+    def type(self):
+        return 'fullyconnected'
