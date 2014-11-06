@@ -11,8 +11,8 @@ class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
         self.load_config()
         #dataset_path = '/Users/tomoakisaito/Documents/dataset'
         dataset_path = '../dataset'
-        self.load_images(dataset_path+'/mnist.pkl.gz')
-        #self.load_mnist('/data/ishimochi0/dataset/mnist')
+        #self.load_images(dataset_path+'/mnist.pkl.gz')
+        self.load_mnist('/data/ishimochi0/dataset/mnist')
         
         #print self.train_labels
         self.layers = []
