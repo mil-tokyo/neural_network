@@ -18,7 +18,7 @@ class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
         self.layers = []
         self.rate = 0.05
         self.activate_function = 'sigmoid'
-        self.batch_size = 1
+        self.batch_size = 10
 
         '''
         initialize layers
@@ -44,8 +44,8 @@ class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
     def learn(self, epoch=1):
         print "learn start"
         total_error = 0
-        print_interval = 50000
-        test_interval = 50000
+        print_interval = 1000
+        test_interval = 5000
         print "total epoch : "+str(epoch)
         seed = [i for i in xrange(len(self.train_labels))]
         for k in range(epoch):
