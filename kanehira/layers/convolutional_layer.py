@@ -9,8 +9,10 @@ class ConvolutionalLayer():
         self.step_size = layer_setting["step_size"]
         self.output_row, self.output_col = layer_setting["output_shape"]
         self.output_kernel_size = layer_setting["output_kernel_size"]        
-        self.W = np.ones((self.output_kernel_size, self.input_kernel_size, self.window_size, self.window_size))
-#        self.W = np.random.uniform(-1,1,size=(self.output_kernel_size, self.input_kernel_size, self.window_size, self.window_size))
+#        self.W = np.ones((self.output_kernel_size, self.input_kernel_size, self.window_size, self.window_size))
+    #    self.W = np.random.uniform(-1,1,size=(self.output_kernel_size, self.input_kernel_size, self.window_size, self.window_size))
+        self.W = np.random.normal(loc=0, scale=0.01, size=(self.output_kernel_size, self.input_kernel_size, self.window_size, self.window_size))
+        
 
     def forward_calculate(self, inp):
         """calculate convolution process"""
@@ -42,12 +44,10 @@ class ConvolutionalLayer():
 
     def update(self, eta):
         self.diff_W = np.zeros(self.W.shape)
-        for j in xrange(self.output_kernel_size):
-            for y in xrange(self.output_row):
-                for x in xrange(self.output_col):
-                    self.diff_W[j, :, :, :] += self.input[:, y : y + self.window_size, x : x + self.window_size] * self.delta_map[j, y, x]
-
-        print self.diff_W
+        for i in xrange(self.input_kernel_size):
+            for j in xrange(self.output_kernel_size):
+                self.diff_W[j, i, :, :] = signal.convolve(self.input[i, :, :], self.delta_map[j, ::-1, ::-1], mode = "valid")[::-1, ::-1]
+            
         self.W -= eta * self.diff_W
 
         if np.isnan(self.W).any():
@@ -68,7 +68,6 @@ if __name__ == "__main__":
           "step_size" : 1
           }
       
-
     a = ConvolutionalLayer(ns)
     b = np.ones((1,2,2))
     c = np.ones((3,3,3))

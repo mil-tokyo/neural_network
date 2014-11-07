@@ -8,17 +8,17 @@ def main():
     import toolbox
     train_data, train_label, test_data, test_label = toolbox.load_mnist()
 
-    random = np.random.randint(len(train_data), size = 1000)
+    random = np.random.randint(len(train_data), size = 4000)
     train_data = train_data[random, :]
     train_label = train_label[random]
     
-    random = np.random.randint(len(test_data), size = 100)
+    random = np.random.randint(len(test_data), size = 1000)
     test_data = test_data[random, :]
     test_label = test_label[random]
-    print train_data.shape
-    print test_data.shape
+    # print train_data.shape
+    # print test_data.shape
     
-#    print train_data[1,:].shape
+#    Print train_data[1,:].shape
 #    train_data = np.hstack((np.ones((train_data.shape[0], 1)), train_data))
 #    test_data = np.hstack((np.ones((test_data.shape[0], 1)), test_data))
 

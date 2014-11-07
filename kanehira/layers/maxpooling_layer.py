@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 class MaxPooling():
     def __init__(self, layer_setting):
@@ -18,14 +19,16 @@ class MaxPooling():
                 patch = inp[:, y * self.window_size : (y + 1) * self.window_size,\
                                    x * self.window_size : (x + 1) * self.window_size]
                 output[:, x, y] = np.max(np.max(patch, axis = 1), axis = 1)
+                
                 for i in xrange(input_kernel_size):
                     sub_patch = patch[i, :, :]
-                    max_index = np.where(sub_patch == np.max(sub_patch))
+                    #max_index = np.where(sub_patch == np.max(sub_patch))
+                    max_index = np.unravel_index( np.argmax(sub_patch) , sub_patch.shape )
                     self.max_index_map[i,  y * self.window_size : (y + 1) * self.window_size,\
-                                   x * self.window_size : (x + 1)* self.window_size ][ max_index ] = 1
+                                   x * self.window_size : (x + 1)* self.window_size ][ max_index ] += 1
 
         if np.isnan(output).any():
-            ValueError("nan value appears in weight maxrix at MaxpoolingLayer forwardcalculation")
+            raise ValueError("nan value appears in weight maxrix at MaxpoolingLayer forwardcalculation")
 
         return output
 

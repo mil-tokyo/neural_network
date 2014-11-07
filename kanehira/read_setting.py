@@ -13,13 +13,13 @@ def read_setting():
          "setting_detail" : { "activation_type" :"ReLU"}
          },
 
-        {"layer_type" : "MaxPooling", "setting_detail" : 0},
+        #{"layer_type" : "MaxPooling", "setting_detail" : 0},
 
         {"layer_type" : "ConvolutionalLayer",
          "setting_detail" : {"input_kernel_size" : 10,
-                             "input_shape" : (12, 12),
+                             "input_shape" : (24, 24),
                              "output_kernel_size" : 12,
-                             "output_shape" : (10, 10),
+                             "output_shape" : (22, 22),
                              "window_size" : 3,
                              "step_size" : 1
                              }
@@ -28,10 +28,10 @@ def read_setting():
          "setting_detail" : { "activation_type" :"ReLU"}
          },
 
-        {"layer_type" : "MaxPooling", "setting_detail" : 0},
+#        {"layer_type" : "MaxPooling", "setting_detail" : 0},
 
         {"layer_type" : "FCLayer", 
-         "setting_detail" : { "input_num" : (12, 5, 5),
+         "setting_detail" : { "input_num" : (12, 22, 22),
                               "output_num" : 128,
                               }
          },
