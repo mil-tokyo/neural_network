@@ -60,6 +60,7 @@ class PoolingLayer(AbstractLayer):
         '''
 
 class ConvolutionalLayer(AbstractLayer):
+
     def __init__(self, num_input, num_output, kernel_size = 5, stride = 1, connection = None):
         self.num_output = num_output
         self.num_input = num_input
