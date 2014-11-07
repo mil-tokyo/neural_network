@@ -2,6 +2,7 @@ import sys,os,struct
 import numpy as np
 from array import array
 import math
+import cPickle
 
 def load_mnist(data_path = '/data/ishimochi0/dataset/mnist/'):
     fname_train_img = os.path.join(data_path, 'train-images-idx3-ubyte')
@@ -67,3 +68,40 @@ def load_mnist(data_path = '/data/ishimochi0/dataset/mnist/'):
 
 
     return train_images,train_labels,test_images,test_labels
+
+
+def load_cifar(self,data_path):
+    image_list = []
+    label_list = []
+    for i in xrange(5):
+        fo = open(os.path.join(data_path,'data_batch_'+str(i+1)),'rb')
+        dict = cPickle.load(fo)
+        fo.close()
+        image_list.append(dict['data'])
+        label_list.append(dict['labels'])
+    train_images = np.r_[image_list[0],image_list[1],image_list[2],image_list[3],imag\
+e_list[4]]
+    train_labels = np.r_[label_list[0],label_list[1],label_list[2],label_list[3],labe\
+l_list[4]]
+    fo = open(os.path.join(data_path,'test_batch'), 'rb')
+    dict= cPickle.load(fo)
+    fo.close()
+    test_images = dict['data']
+    test_labels = dict['labels']
+
+    test_images = test_images / 255.0
+    train_images = train_images / 255.0
+
+    # resize images to 2D
+    dsize = 32
+    train_images = train_images.reshape(len(train_images),3,dsize,dsize)
+    test_images = test_images.reshape(len(test_images),3,dsize,dsize)
+    train_labels = np.array(train_labels)
+    test_labels = np.array(test_labels)
+
+    test_labels = np.fromfunction(lambda i,j:j==test_labels[i],(len(test_labels)\
+,max(test_labels)+1),dtype=int)+0
+    train_labels = np.fromfunction(lambda i,j:j==train_labels[i],(len(train_labe\
+ls),max(train_labels)+1),dtype=int)
+    
+    return train_images, train_labels, test_images, test_labels
