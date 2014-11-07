@@ -24,13 +24,20 @@ class MaxPooling():
                     self.max_index_map[i,  y * self.window_size : (y + 1) * self.window_size,\
                                    x * self.window_size : (x + 1)* self.window_size ][ max_index ] = 1
 
+        if np.isnan(output).any():
+            ValueError("nan value appears in weight maxrix at MaxpoolingLayer forwardcalculation")
+
         return output
 
     def back_calculate(self, prev_delta):
         prev_kernel_size, prev_row, prev_col = prev_delta.shape
         rep_prev_delta = np.repeat(np.repeat(prev_delta, self.window_size, axis=1), self.window_size, axis=2)
+        if np.isnan(prev_delta).any():
+            raise ValueError("nan value appears in weight maxrix at MaxpoolingLayer backpropagation")
         return rep_prev_delta * self.max_index_map
 
     def update(self, eta):
         pass
 
+    def __str__(self):
+        return "MaxPooling"
