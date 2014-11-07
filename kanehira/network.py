@@ -8,7 +8,7 @@ import numpy as np
 class NeuralNetwork:
     def __init__(self, network_setting):
         ## read network setting ##
-        self.eta = 0.001
+        self.eta = 0.01
         self.layers_list = []
         for setting in network_setting:
             layer_type = setting["layer_type"]
@@ -23,7 +23,8 @@ class NeuralNetwork:
         iteration = 1
         for j in xrange(iteration):
             for i in xrange(datanum):
-                print "data: %d/%d"%(i, datanum)
+                if i % 1000 == 0:
+                    print "data: %d/%d"%(i, datanum)
                 x = x_train[i, :]
                 t = labels[i, :]
                 """ForwardPropagetion"""
@@ -47,6 +48,8 @@ class NeuralNetwork:
         input = x
         for i,l in enumerate(self.layers_list):
             output = l.forward_calculate(input)
+            #if i==0:
+            #    print np.sum(output)
             input = output
         return output
     
@@ -58,6 +61,7 @@ class NeuralNetwork:
             prev_delta = delta
             
     def Update(self):
+        """ update all layers """
         for i, l in enumerate(self.layers_list):
             l.update(self.eta)
            
