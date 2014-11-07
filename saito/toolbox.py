@@ -70,7 +70,7 @@ def load_mnist(data_path = '/data/ishimochi0/dataset/mnist/'):
     return train_images,train_labels,test_images,test_labels
 
 
-def load_cifar(self,data_path):
+def load_cifar(self,data_path = '/data/ishimochi2/saito/cifar-10-batches-py'):
     image_list = []
     label_list = []
     for i in xrange(5):
