@@ -59,8 +59,8 @@ class NeuralNetwork:
             
     def Update(self):
         for i, l in enumerate(self.layers_list):
-            delta = l.update(self.eta)
+            l.update(self.eta)
            
     def __str__(self):
-        ## show network information ##
-        return "\n".join(map(str, self_list))
+        """ show network information """
+        return "\n".join(map(str, self.layers_list))
