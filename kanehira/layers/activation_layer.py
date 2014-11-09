@@ -13,7 +13,7 @@ class Activation():
     def back_calculate(self, prev_delta):
         return self.d_act_func(self.output) * prev_delta
 
-    def update(self, eta):
+    def update(self, eta, batch_size):
         pass
 
     def _tanh(self, x):
