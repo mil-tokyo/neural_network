@@ -13,9 +13,11 @@ class MemFCLayer(layer.FCLayer):
         self.memreset()
 
     def forward(self,ivector):
-        self.ivectors=self.ivectors[:-1].append(ivector)
+        self.ivectors.pop()
+        self.ivectors.insert(0,ivector)
         ovector=np.dot(self.weight,ivector)
-        self.ovectors=self.ovectors[:-1].append(ovector)
+        self.ovectors.pop()
+        self.ovectors.insert(0,ovector)
         return ovector
 
     def backward(self,odiff,t):
