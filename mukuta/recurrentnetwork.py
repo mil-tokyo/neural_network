@@ -33,7 +33,7 @@ class RecurrentNetwork:
         for i in range(self.tmem):
             odiff = self.nonlinearlayer.backward(odiff)
             self.wordmaplayer.backward(odiff,i)
-            odiff = self.latentmaplayer(odiff,i)
+            odiff = self.latentmaplayer.backward(odiff,i)
 
     def update(self):
         self.wordmaplayer.update()
