@@ -12,7 +12,8 @@ class FCLayer:
             self.is_reshape = False
             self.input_num = self.input_shape
 
-        self.W = np.random.uniform(-1, 1, size = (self.output_num, self.input_num) )
+        self.W = np.random.normal(0, 0.1, size = (self.output_num, self.input_num) )
+        self.div = np.zeros(self.W.shape)
         self.inp = None
 
     def forward_calculate(self, inp):
@@ -31,14 +32,16 @@ class FCLayer:
         self.delta = prev_delta
 
         delta = np.dot(self.W.T, prev_delta)
+        self.div += np.dot(np.matrix(self.delta).T, np.matrix(self.inp))
+
         if self.is_reshape:
             return np.reshape(delta, self.input_shape)
         else: 
             return delta
 
-    def update(self, eta):
-        self.div = np.dot(np.matrix(self.delta).T, np.matrix(self.inp))
-        self.W = np.array(self.W - eta * self.div)
+    def update(self, eta, batch_size):
+        self.W = np.array(self.W - eta * self.div / batch_size)
+        self.div = np.zeros(self.W.shape) 
 
         if np.isnan(self.W).any():
             raise ValueError("nan value appeared in weight matrix at FCLayer\n" + \
@@ -46,3 +49,9 @@ class FCLayer:
 
     def __str__(self):
         return "FCLayer W:{}".format(self.W)
+
+if __name__ == "__main__":
+    a=FCLayer({"input_num" : (2,3,3), "output_num": 5})
+    print a.forward_calculate(np.zeros((2,3,3)))
+    print a.back_calculate(np.array([1,2,3,4,5]))
+                       
