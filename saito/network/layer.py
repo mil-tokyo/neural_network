@@ -112,7 +112,7 @@ class ConvolutionalLayer(AbstractLayer):
         for i in xrange(next_derr.shape[0]):
             for j in xrange(self.node.shape[0]):
                 self.dweight[i,j,:,:] += np.rot90(convolve2d(self.node[j,:,:],np.rot90(next_derr[i,:,:],2),mode='valid'),2)        
-
+                self.dweight[i,j,:,:] += convolve2d(np.rot90(self.node[j,:,:],2), next_derr[i,:,:], mode='valid')
 
         # self.dweight = np.outer(next_derr, self.node)
         # self.derr = np.dot(self.weight.T, next_derr)
