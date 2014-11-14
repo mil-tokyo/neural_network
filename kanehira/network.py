@@ -8,9 +8,12 @@ import numpy as np
 class NeuralNetwork:
     def __init__(self, network_setting):
         ## read network setting ##
-        self.eta = 0.001
+        self.eta = network_setting["learning_rate"]
+        self.batch_size = network_setting["batch_size"]
+        layers_setting = network_setting["layers_setting"]
+
         self.layers_list = []
-        for setting in network_setting:
+        for setting in layers_setting:
             layer_type = setting["layer_type"]
             print "initialize {}...".format(layer_type)
             setting_detail = setting["setting_detail"]
@@ -20,10 +23,11 @@ class NeuralNetwork:
     def train(self, x_train, labels):
         ## x_train:train samples (datanum,featuredim), labels:label (datanum,classnum), eta:training coefficiend ##
         datanum = x_train.shape[0]
-        iteration = 1
+        iteration = 3
         for j in xrange(iteration):
             for i in xrange(datanum):
-                print "data: %d/%d"%(i, datanum)
+                if i % 1000 == 0:
+                    print "data: %d/%d"%(i, datanum)
                 x = x_train[i, :]
                 t = labels[i, :]
                 """ForwardPropagetion"""
@@ -31,7 +35,8 @@ class NeuralNetwork:
                 """BackPropagetion"""
                 self.BackPropagate(t, output)
                 """Update parameters"""
-                self.Update()
+                if i % self.batch_size == 0:
+                    self.Update()
 
     def predict(self, x_test, classnum):
         datanum = x_test.shape[0]
@@ -58,9 +63,10 @@ class NeuralNetwork:
             prev_delta = delta
             
     def Update(self):
+        """ update all layers """
         for i, l in enumerate(self.layers_list):
-            delta = l.update(self.eta)
+            l.update(self.eta, self.batch_size)
            
     def __str__(self):
-        ## show network information ##
-        return "\n".join(map(str, self_list))
+        """ show network information """
+        return "\n".join(map(str, self.layers_list))
