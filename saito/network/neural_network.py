@@ -13,7 +13,7 @@ class NeuralNetwork(AbstractNeuralNetwork):
         dataset_path = '../dataset'
         self.load_images(dataset_path+'/mnist.pkl.gz')
         #self.load_mnist('/data/ishimochi0/dataset/mnist')
-        
+
         #print self.train_labels
         self.num_unit_of_each_layer = num_unit_of_each_layer
         self.layers = []
