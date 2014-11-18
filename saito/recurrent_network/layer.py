@@ -139,3 +139,5 @@ class OutputLayer():
         nothing to do
         '''
 
+    def error(self):
+        error = np.power(next_derr - self.node,2)
