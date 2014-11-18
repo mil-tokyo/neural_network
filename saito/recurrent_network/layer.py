@@ -35,8 +35,6 @@ class InputLayer():
             trancate = min(max_trancate, self.nodes.shape[1])
             self.dweight = np.dot(next_derr[:,1:trancate], self.nodes[:,1:trancate].T)
 
-        print next_derr.shape
-        print self.nodes.shape
     def update(self, alpha, beta):
         self.weight = (1 - beta) * self.weight + alpha * self.dweight
         '''
@@ -120,6 +118,7 @@ class OutputLayer():
     def __init__(self):
         self.node = None
         self.derr = None
+        self.error = None
         # output : dic_size * 1
     def reinit(self):
         self.node = None
@@ -133,11 +132,9 @@ class OutputLayer():
     def back(self, next_derr = None, max_trancate = 1000):
         self.derr = next_derr - self.node
         # next_derr : teacher vector
-        
+        self.error = sum(np.power(next_derr - self.node,2))
+
     def update(self,alpha,beta):
         '''
         nothing to do
         '''
-
-    def error(self):
-        error = np.power(next_derr - self.node,2)

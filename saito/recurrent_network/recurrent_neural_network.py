@@ -19,6 +19,7 @@ class RecurrentNeuralNetwork():
         self.layers.append(layer.OutputLayer())
 
     def learn(self):
+        print 'learn start'
         print_interval = 500
         layers_num = len(self.layers)
         error = 0
@@ -42,7 +43,7 @@ class RecurrentNeuralNetwork():
             '''
             for i in xrange(layers_num-1):
                 self.layers[i].update(self.alpha, self.beta)
-            error += self.layers[layers_num-1].error()
+            error += self.layers[layers_num-1].error
             if word_index % print_interval == print_interval - 1:
                 print "error : " + str(error)
                 error = 0
