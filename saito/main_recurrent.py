@@ -8,3 +8,5 @@ import numpy as np
 
 rnn = network.recurrent_neural_network.RecurrentNeuralNetwork()
 rnn.learn()
+rnn.reinit()
+rnn.learn()

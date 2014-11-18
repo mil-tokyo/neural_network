@@ -79,10 +79,8 @@ def load_cifar(self,data_path = '/data/ishimochi2/saito/cifar-10-batches-py'):
         fo.close()
         image_list.append(dict['data'])
         label_list.append(dict['labels'])
-    train_images = np.r_[image_list[0],image_list[1],image_list[2],image_list[3],imag\
-e_list[4]]
-    train_labels = np.r_[label_list[0],label_list[1],label_list[2],label_list[3],labe\
-l_list[4]]
+    train_images = np.r_[image_list[0],image_list[1],image_list[2],image_list[3],image_list[4]]
+    train_labels = np.r_[label_list[0],label_list[1],label_list[2],label_list[3],label_list[4]]
     fo = open(os.path.join(data_path,'test_batch'), 'rb')
     dict= cPickle.load(fo)
     fo.close()
@@ -99,9 +97,47 @@ l_list[4]]
     train_labels = np.array(train_labels)
     test_labels = np.array(test_labels)
 
-    test_labels = np.fromfunction(lambda i,j:j==test_labels[i],(len(test_labels)\
-,max(test_labels)+1),dtype=int)+0
-    train_labels = np.fromfunction(lambda i,j:j==train_labels[i],(len(train_labe\
-ls),max(train_labels)+1),dtype=int)
+    test_labels = np.fromfunction(lambda i,j:j==test_labels[i],(len(test_labels),max(test_labels)+1),dtype=int)+0
+    train_labels = np.fromfunction(lambda i,j:j==train_labels[i],(len(train_labels),max(train_labels)+1),dtype=int)
     
     return train_images, train_labels, test_images, test_labels
+
+def load_language_model(datapath = '../dataset/rnnlm-data'):
+    train_file_path = os.path.join(datapath, 'ptb.train.txt')
+    test_file_path = os.path.join(datapath, 'ptb.test.txt')
+    train_txt = []
+    test_txt = []
+    print 'loading language dataset'
+    print '   loading train data'
+    for line in open(train_file_path,'r'):
+        line_list = line.split(' ')
+        for i in xrange(1,len(line_list)-1):
+            train_txt.append(line_list[i])
+
+    print '   loading test data'
+    for line in open(test_file_path,'r'):
+        line_list = line.split(' ')
+        for i in xrange(1,len(line_list)-1):
+            test_txt.append(line_list[i])
+
+    print '   making dictionary'
+    language_dictionary = []    
+    for i in xrange(len(train_txt)):
+        if train_txt[i] not in language_dictionary:
+            language_dictionary.append(train_txt[i])
+
+    train_data = np.zeros((len(train_txt),len(language_dictionary)))
+    test_data = np.zeros((len(test_txt),len(language_dictionary)))
+    
+    print '   making train&test data from dictionary'
+    for i in xrange(len(train_txt)):
+        train_data[i,language_dictionary.index(train_txt[i])] = 1
+    for i in xrange(len(test_txt)):
+        test_data[i,language_dictionary.index(test_txt[i])] = 1
+
+    '''
+    train_data : train data count * dictionary size
+    test_data : test data count * dictionary size
+    '''
+
+    return train_data, test_data
