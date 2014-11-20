@@ -21,7 +21,11 @@ class NeuralNetwork:
             self.layers_list.append(layer)
 
     def train(self, x_train, labels):
-        ## x_train:train samples (datanum,featuredim), labels:label (datanum,classnum), eta:training coefficiend ##
+        """ 
+        input -> x_train: train samples (datanum, featuredim), 
+                 labels:label (datanum,classnum),
+                 eta:training coefficiend
+        """
         datanum = x_train.shape[0]
         iteration = 3
         for j in xrange(iteration):
@@ -31,23 +35,23 @@ class NeuralNetwork:
                 x = x_train[i, :]
                 t = labels[i, :]
                 """ForwardPropagetion"""
-                output = self.ForwardPropagate(x)
+                output = self.forward_propagate(x)
                 """BackPropagetion"""
-                self.BackPropagate(t, output)
+                self.back_propagate(t, output)
                 """Update parameters"""
                 if i % self.batch_size == 0:
-                    self.Update()
+                    self.update()
 
     def predict(self, x_test, classnum):
         datanum = x_test.shape[0]
         result = np.zeros((datanum, classnum))
         for i in xrange(datanum):
             x = x_test[i, :]
-            output = self.ForwardPropagate(x)
+            output = self.forward_propagate(x)
             result[i, np.argmax(output)] = 1
         return result
     
-    def ForwardPropagate(self, x):
+    def forward_propagate(self, x):
         """calculate forward process"""
         input = x
         for i,l in enumerate(self.layers_list):
@@ -55,14 +59,14 @@ class NeuralNetwork:
             input = output
         return output
     
-    def BackPropagate(self, t, output):
+    def back_propagate(self, t, output):
         """calculate back propagation"""
         prev_delta = output-t
         for i, l in enumerate(self.layers_list[::-1]):
             delta = l.back_calculate(prev_delta)
             prev_delta = delta
             
-    def Update(self):
+    def update(self):
         """ update all layers """
         for i, l in enumerate(self.layers_list):
             l.update(self.eta, self.batch_size)
