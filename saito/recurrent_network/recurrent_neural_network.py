@@ -7,9 +7,9 @@ class RecurrentNeuralNetwork():
     def __init__(self):
         print "initializing network"
         self.layers = []
-        self.max_trancate = 100
-        self.alpha = 0.05
-        self.beta = 0.01
+        self.max_trancate = 4
+        self.alpha = 0.03
+        self.beta = 0.001
         self.load_language_model('../dataset/rnnlm-data')
         self.dic_size = self.train_data.shape[1]
         self.hidden_node_size = 100
@@ -76,8 +76,8 @@ class RecurrentNeuralNetwork():
             if train_txt[i] not in language_dictionary:
                 language_dictionary.append(train_txt[i])
 
-        self.train_data = np.zeros((len(train_txt),len(language_dictionary)))
-        self.test_data = np.zeros((len(test_txt),len(language_dictionary)))
+        self.train_data = np.zeros((len(train_txt),len(language_dictionary)), dtype=np.int)
+        self.test_data = np.zeros((len(test_txt),len(language_dictionary)), dtype=np.int)
 
         print '   making train&test data from dictionary'
         for i in xrange(len(train_txt)):
