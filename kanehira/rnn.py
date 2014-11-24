@@ -1,35 +1,24 @@
 import numpy as np
 from layers.fully_connected_layer import FCLayer
 from layers.activation_layer import Activation
+from layers.dummy_layer import DummyLayer
 import sys
 sys.path.append("../saito/")
 from toolbox import load_language_model
 
 
-class DummyLayer():
-    def __init__(self):
-        pass
-
-    def forward_calculate(self, inp):
-        return 0
-
-    def back_calculate(self, delta):
-        pass
-
-    def get_params(self, param):
-        return 0
-
 class RecurrentNeurealNetwork():
     def __init__(self, network_setting):
-        self.eta = 0.05#network_setting["learning_rate"]
+        self.alpha = 0.05#network_setting["learning_rate"]
+        self.beta = 0.01
         self.batch_size = 1#network_setting["batch_size"]
         self.network_depth = network_setting["network_depth"]
         self.hidden_num = network_setting["hidden_num"]
         self.words_num = network_setting["input_num"]
 
-        self.W = np.random.normal(0, 0.01, size=(self.hidden_num, self.hidden_num))
-        self.U = np.random.normal(0, 0.01, size=(self.hidden_num, self.words_num))
-        self.V = np.random.normal(0, 0.01, size=(self.words_num, self.hidden_num))
+        self.W = np.random.normal(0, 0.1, size=(self.hidden_num, self.hidden_num))
+        self.U = np.random.normal(0, 0.1, size=(self.hidden_num, self.words_num))
+        self.V = np.random.normal(0, 0.1, size=(self.words_num, self.hidden_num))
 
         #layers_setting = network_setting["layers_setting"]
         self.input_layers_list = []
@@ -92,17 +81,19 @@ class RecurrentNeurealNetwork():
                                                   
     def update(self):
         V_div = self.hidden_layers_list[-1].get_params("div")
-        U_div = sum([layer.get_params("div") for layer in self.input_layers_list])
+        U_div = sum([layer.get_params("div") for layer in self.input_layers_list[:-1]])
         W_div = sum([layer.get_params("div") for layer in self.hidden_layers_list[:-1]])
 
-        self.V -= self.eta * V_div + 0.1 * self.V
-        self.U -= self.eta * U_div + 0.1 * self.U
-        self.W -= self.eta * W_div + 0.1 * self.W
+        self.V = self.V - self.alpha * V_div + self.beta * self.V
+        self.U = self.U - self.alpha * U_div + self.beta * self.U
+        self.W = self.W - self.alpha * W_div + self.beta * self.W
+
+        [layer.set_params("div", 0) for layer in self.input_layers_list[:-1]]
+        [layer.set_params("div", 0) for layer in self.hidden_layers_list]
 
 
 if __name__ == "__main__":
     train, test = load_language_model()
-    print train.shape[1]
         
     rnn = RecurrentNeurealNetwork({"input_num": train.shape[1], "hidden_num" : 100, "network_depth" : 3})
 #    a = np.ones((1000, 2, 100))

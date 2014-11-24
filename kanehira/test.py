@@ -1,9 +1,8 @@
-from network import NeuralNetwork
+from convolutional_neuralnetwork import NeuralNetwork
 import read_setting
 import numpy as np
 import sys
 from sklearn.datasets import fetch_mldata
-from sklearn.cross_validation import train_test_split
 from sklearn import preprocessing
 
 def main():

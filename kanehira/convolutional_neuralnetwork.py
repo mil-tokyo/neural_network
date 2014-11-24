@@ -9,6 +9,7 @@ class NeuralNetwork:
     def __init__(self, network_setting):
         ## read network setting ##
         self.eta = network_setting["learning_rate"]
+        self.iteration = network_setting["iteration"]
         self.batch_size = network_setting["batch_size"]
         layers_setting = network_setting["layers_setting"]
 
@@ -27,8 +28,7 @@ class NeuralNetwork:
                  eta:training coefficiend
         """
         datanum = x_train.shape[0]
-        iteration = 3
-        for j in xrange(iteration):
+        for j in xrange(self.iteration):
             for i in xrange(datanum):
                 if i % 1000 == 0:
                     print "data: %d/%d"%(i, datanum)

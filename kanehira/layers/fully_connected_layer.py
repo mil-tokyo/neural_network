@@ -1,8 +1,8 @@
 import numpy as np
 import sys
+from abstract_layer import Layer
 
-
-class FCLayer:
+class FCLayer(Layer):
     def __init__(self, layer_setting, init_W=None):
         self.input_shape = layer_setting["input_num"]
         self.output_num = layer_setting["output_num"]
@@ -14,10 +14,10 @@ class FCLayer:
             self.is_reshape = False
             self.input_num = self.input_shape
 
-        if init_W.any():
+        if init_W is not None: 
             self.W = init_W
         else:
-            self.W = np.random.normal(0, 0.1, size = (self.output_num, self.input_num) )
+            self.W = np.random.normal(0, 0.1, size = (self.output_num, self.input_num))
 
         self.div = np.zeros(self.W.shape)
         self.inp = None
@@ -32,12 +32,11 @@ class FCLayer:
         return self.a
 
     def back_calculate(self, prev_delta):
-        if np.isnan(prev_delta).any():
-            raise ValueError("nan value appeared in prev_delta at FCLayer backcalculatioin\n" + \
-                                 "delta = {}".format(prev_delta))
+#        if np.isnan(prev_delta).any():
+ #           raise ValueError("nan value appeared in prev_delta at FCLayer backcalculatioin\n" + \
+  #                               "delta = {}".format(prev_delta))
         self.delta = prev_delta
         delta = np.dot(self.W.T, prev_delta)
-#        self.div += np.dot(np.matrix(self.delta).T, np.matrix(self.inp))
         self.div += np.outer(self.delta, self.inp)
 
         if self.is_reshape:
@@ -49,13 +48,10 @@ class FCLayer:
         self.W = self.W - eta * self.div / batch_size
         self.div = np.zeros(self.W.shape) 
 
-        if np.isnan(self.W).any():
-            raise ValueError("nan value appeared in weight matrix at FCLayer\n" + \
-                                 "div = {}".format(self.div))
+       # if np.isnan(self.W).any():
+       #     raise ValueError("nan value appeared in weight matrix at FCLayer\n" + \
+       #                          "div = {}".format(self.div))
 
-    def get_params(self, param_name): 
-        return getattr(self, param_name)
-        
     def __str__(self):
         return "FCLayer W:{}".format(self.W)
 
