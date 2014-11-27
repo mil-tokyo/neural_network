@@ -1,5 +1,5 @@
-*/.DS_Store
+B0;95;c*/.DS_Store
 *.pyc
 *~
-./dataset/simple-example
-./saito/sample
+./dataset/simple-example/*
+./saito/sample/*
