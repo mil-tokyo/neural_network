@@ -135,7 +135,8 @@ class OutputLayer():
     def back(self, next_derr = None, max_trancate = 1000):
         self.derr = next_derr - self.node
         # next_derr : teacher vector
-        self.error = sum(np.power(next_derr - self.node,2))
+        self.error = -sum(next_derr*np.log(self.node))
+        # self.error = sum(np.power(next_derr - self.node,2))
 
     def update(self,alpha,beta):
         '''
