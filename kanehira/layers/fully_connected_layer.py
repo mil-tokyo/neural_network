@@ -28,8 +28,7 @@ class FCLayer(Layer):
         else:
             self.inp = inp
 
-        self.a = np.dot(self.W, self.inp)
-        return self.a
+        return np.dot(self.W, self.inp)
 
     def back_calculate(self, prev_delta):
 #        if np.isnan(prev_delta).any():
@@ -46,7 +45,7 @@ class FCLayer(Layer):
 
     def update(self, eta, batch_size):
         self.W = self.W - eta * self.div / batch_size
-        self.div = np.zeros(self.W.shape) 
+        self.div = 0#np.zeros(self.W.shape) 
 
        # if np.isnan(self.W).any():
        #     raise ValueError("nan value appeared in weight matrix at FCLayer\n" + \

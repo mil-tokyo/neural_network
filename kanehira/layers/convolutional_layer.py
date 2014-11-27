@@ -17,38 +17,19 @@ class ConvolutionalLayer():
         """calculate convolution process"""
         self.input = inp
         output = convolve3d(inp, self.W, self.window_size, mode='valid', axis=0)
-#        output = np.zeros((self.output_kernel_size, self.output_row, self.output_col))
-
-#        for j in xrange(self.output_kernel_size):
-#            output[j, :, :] = signal.convolve(inp, self.W[j, :, :, :], mode='valid')
-
         return output
 
     def back_calculate(self, prev_delta_map):
         """calculate back propagation"""
         self.delta_map = prev_delta_map
-#        delta_map = np.zeros((self.input_kernel_size, self.input_row, self.input_col))
-
         delta_map = convolve3d(prev_delta_map, self.W[:, :, ::-1, ::-1], self.window_size, mode='full', axis=1)
-#        for i in xrange(self.input_kernel_size):
-#            for j in xrange(self.output_kernel_size):
- #               delta_map[i, :, :] += signal.convolve(prev_delta_map[j, :, :], self.W[j, i, ::-1, ::-1], mode='full')
-
-        self.diff_W += convolve2d_with3d(self.input, self.delta_map[:, ::-1, ::-1])[:, :, ::-1, ::-1]
-#        for i in xrange(self.input_kernel_size):
-#            for j in xrange(self.output_kernel_size):
-#                self.diff_W[j, i, :, :] += signal.convolve(self.input[i, :, :], self.delta_map[j, ::-1, ::-1], mode = "valid")[::-1, ::-1]
-
-        #if np.isnan(self.delta_map).any():
-        #    print self.delta_map
-        #    raise ValueError("nan value appeared in weight matrix at ConvLayer, backcalculate\n"\
-        #                         "delta_map({}) =\n {}".format(self.delta_map.shape, self.delta_map))
+        self.diff_W += convolve2d_with3d(self.input, self.delta_map)
         return delta_map
 
-    def update(self, eta, batch_size):            
+    def update(self, eta, batch_size):
         self.W -= eta * self.diff_W / batch_size
         self.diff_W = np.zeros(self.W.shape)
-                        
+
     def __str__(self):
         return "ConvolutionalLayer W:{}".format(self.W)
 

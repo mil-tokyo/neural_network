@@ -9,16 +9,16 @@ from toolbox import load_language_model
 
 class RecurrentNeurealNetwork():
     def __init__(self, network_setting):
-        self.alpha = 0.05#network_setting["learning_rate"]
-        self.beta = 0.01
+        self.alpha = 0.01#network_setting["learning_rate"]
+        self.beta = 0.001
         self.batch_size = 1#network_setting["batch_size"]
         self.network_depth = network_setting["network_depth"]
         self.hidden_num = network_setting["hidden_num"]
         self.words_num = network_setting["input_num"]
 
-        self.W = np.random.normal(0, 0.1, size=(self.hidden_num, self.hidden_num))
-        self.U = np.random.normal(0, 0.1, size=(self.hidden_num, self.words_num))
-        self.V = np.random.normal(0, 0.1, size=(self.words_num, self.hidden_num))
+        self.W = np.random.normal(0, 0.01, size=(self.hidden_num, self.hidden_num))
+        self.U = np.random.normal(0, 0.01, size=(self.hidden_num, self.words_num))
+        self.V = np.random.normal(0, 0.01, size=(self.words_num, self.hidden_num))
 
         #layers_setting = network_setting["layers_setting"]
         self.input_layers_list = []
@@ -84,13 +84,16 @@ class RecurrentNeurealNetwork():
         U_div = sum([layer.get_params("div") for layer in self.input_layers_list[:-1]])
         W_div = sum([layer.get_params("div") for layer in self.hidden_layers_list[:-1]])
 
-        self.V = self.V - self.alpha * V_div + self.beta * self.V
-        self.U = self.U - self.alpha * U_div + self.beta * self.U
-        self.W = self.W - self.alpha * W_div + self.beta * self.W
+        self.V = self.V - self.alpha * V_div# - self.beta * self.V
+        self.U = self.U - self.alpha * U_div# - self.beta * self.U
+        self.W = self.W - self.alpha * W_div# - self.beta * self.W
 
         [layer.set_params("div", 0) for layer in self.input_layers_list[:-1]]
         [layer.set_params("div", 0) for layer in self.hidden_layers_list]
 
+        self.hidden_layers_list[-1].set_params("W", self.V)
+        [layer.set_params("W", self.U) for layer in self.input_layers_list[:-1]]
+        [layer.set_params("W", self.W) for layer in self.hidden_layers_list[:-1]]
 
 if __name__ == "__main__":
     train, test = load_language_model()

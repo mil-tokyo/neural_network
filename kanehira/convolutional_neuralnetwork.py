@@ -8,7 +8,7 @@ import numpy as np
 class NeuralNetwork:
     def __init__(self, network_setting):
         ## read network setting ##
-        self.eta = network_setting["learning_rate"]
+        self.eta0 = network_setting["learning_rate"]
         self.iteration = network_setting["iteration"]
         self.batch_size = network_setting["batch_size"]
         layers_setting = network_setting["layers_setting"]
@@ -28,14 +28,18 @@ class NeuralNetwork:
                  eta:training coefficiend
         """
         datanum = x_train.shape[0]
+        likelihood = 0
         for j in xrange(self.iteration):
+            self.eta = self.eta0 / ( 1 + j / (self.iteration-1)) 
             for i in xrange(datanum):
                 if i % 1000 == 0:
-                    print "data: %d/%d"%(i, datanum)
+                    print "data: {}/{} error:{}".format(i, datanum, likelihood / 1000)
+                    likelihood = 0
                 x = x_train[i, :]
                 t = labels[i, :]
                 """ForwardPropagetion"""
                 output = self.forward_propagate(x)
+                likelihood -= np.sum( t * np.log(output) )
                 """BackPropagetion"""
                 self.back_propagate(t, output)
                 """Update parameters"""
