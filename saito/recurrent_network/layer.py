@@ -56,7 +56,6 @@ class HiddenLayer():
         self.out_dweight = np.zeros(self.out_weight.shape)
         # V : dic_size * hidden_node_size
 
-        self.softmax = lambda x : np.exp(x)/sum(np.exp(x))
 
         if activate_function == 'sigmoid':
             self.ac = lambda x : 1.0 / (1+np.exp(-x))
@@ -66,6 +65,10 @@ class HiddenLayer():
             it's an unsupported function
             '''
             raise NameError(error)
+
+    def softmax(self, x):
+        x = x - max(x)
+        return np.exp(x)/sum(np.exp(x))
 
     def reinit(self):
         self.nodes = None
@@ -132,7 +135,8 @@ class OutputLayer():
     def back(self, next_derr = None, max_trancate = 1000):
         self.derr = next_derr - self.node
         # next_derr : teacher vector
-        self.error = sum(np.power(next_derr - self.node,2))
+        self.error = -sum(next_derr*np.log(self.node))
+        # self.error = sum(np.power(next_derr - self.node,2))
 
     def update(self,alpha,beta):
         '''

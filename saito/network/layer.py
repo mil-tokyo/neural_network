@@ -89,7 +89,10 @@ class ConvolutionalLayer(AbstractLayer):
 
         next_node = np.zeros(self.next_node_size)
         for i in xrange(self.weight.shape[0]):
-            next_node[i,:,:] = convolve(self.node, self.weight[i,:,:,:],mode='valid')
+            #next_node[i,:,:] = convolve(self.node, self.weight[i,:,:,:],mode='valid')
+            for j in xrange(self.weight.shape[1]):
+                # next_node[i,:,:] += convolve2d(self.node[j], self.weight[i,j,:,:],mode='valid')
+                next_node[i,:,:] += self.myconvolve2d(self.node[j], self.weight[i,j,:,:],mode='valid')
             # for j in xrange(self.weight.shape[1]):
             #     next_node[i,:,:] = next_node[i,:,:] + convolve2d(self.node[j,:,:],self.weight[i,j,:,:],mode='valid')
         return next_node
@@ -104,15 +107,16 @@ class ConvolutionalLayer(AbstractLayer):
         # next_derr_with_zero[:,self.weight.shape[2]-1:self.weight.shape[2]-1+self.next_node_size[1],self.weight.shape[3]-1:self.weight.shape[3]-1+self.next_node_size[2]] = next_derr
         for i in xrange(self.weight.shape[0]):
             for j in xrange(self.weight.shape[1]):
-                self.derr[j,:,:] += convolve2d(next_derr[i,:,:],np.rot90(self.weight[i,j,:,:],2),mode='full')
+                # self.derr[j,:,:] += convolve2d(next_derr[i,:,:],np.rot90(self.weight[i,j,:,:],0),mode='full')
+                self.derr[j,:,:] += self.myconvolve2d(next_derr[i,:,:],np.rot90(self.weight[i,j,:,:],2),mode='full')
 
         # for i in xrange(self.weight.shape[1]):
         #     self.derr[i] = convolve(next_derr_with_zero, np.rot90(self.weight[:,i,:,:], 2),mode='val')
 
         for i in xrange(next_derr.shape[0]):
             for j in xrange(self.node.shape[0]):
-                self.dweight[i,j,:,:] += np.rot90(convolve2d(self.node[j,:,:],np.rot90(next_derr[i,:,:],2),mode='valid'),2)        
-                self.dweight[i,j,:,:] += convolve2d(np.rot90(self.node[j,:,:],2), next_derr[i,:,:], mode='valid')
+                # self.dweight[i,j,:,:] += convolve2d(np.rot90(self.node[j,:,:],0), next_derr[i,:,:], mode='valid')
+                self.dweight[i,j,:,:] += self.myconvolve2d(np.rot90(self.node[j,:,:],0), next_derr[i,:,:], mode='valid')
 
         # self.dweight = np.outer(next_derr, self.node)
         # self.derr = np.dot(self.weight.T, next_derr)
@@ -125,6 +129,9 @@ class ConvolutionalLayer(AbstractLayer):
         self.bias = self.bias - rate * self.dbias
         self.dweight = np.zeros(self.dweight.shape)
         self.dbias = np.zeros(self.dbias.shape)
+
+    def myconvolve2d(self, a, b, mode='full'):
+        return convolve2d(a,np.rot90(b,2),mode = mode)
 
 class FullyConnectedLayer(AbstractLayer):
     def __init__(self, node_num, next_node_num):
@@ -216,7 +223,8 @@ class OutputLayer(AbstractLayer):
 
     def back(self, label_array):
         self.derr = self.node - label_array
-        err = np.dot(self.derr,self.derr)/2
+        err = sum(-label_array * np.log(self.node))
+        #err = np.dot(self.derr,self.derr)/2
         return err
 
     def update(self, rate, batch_size=1):
