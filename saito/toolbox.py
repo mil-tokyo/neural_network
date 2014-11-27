@@ -102,7 +102,7 @@ def load_cifar(self,data_path = '/data/ishimochi2/saito/cifar-10-batches-py'):
     
     return train_images, train_labels, test_images, test_labels
 
-def load_language_model(datapath = '../dataset/rnnlm-data'):
+def load_language_model(datapath = '/data/ishimochi0/dataset/rnnlm-data'):
     train_file_path = os.path.join(datapath, 'ptb.train.txt')
     test_file_path = os.path.join(datapath, 'ptb.test.txt')
     train_txt = []

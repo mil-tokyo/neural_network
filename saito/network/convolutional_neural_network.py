@@ -13,7 +13,7 @@ class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
         dataset_path = '../dataset'
         #self.load_images(dataset_path+'/mnist.pkl.gz')
         self.load_mnist('/data/ishimochi0/dataset/mnist')
-        self.load_cifar('/data/ishimochi2/saito/cifar-10-batches-py')
+        #self.load_cifar('/data/ishimochi2/saito/cifar-10-batches-py')
         #print self.train_labels
         self.layers = []
         self.rate = 0.05
@@ -23,10 +23,23 @@ class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
         '''
         initialize layers
         '''
-        # self.layers.append(layer.ConvolutionalLayer(num_input = 1,num_output = 10,kernel_size = 5,stride = 1))
+        self.layers.append(layer.ConvolutionalLayer(num_input = 1,num_output = 10,kernel_size = 5,stride = 1))
+        self.layers.append(layer.PoolingLayer(kernel_size = 2, stride = 2, pool_type = 'MAX'))
+        self.layers.append(layer.ActivateLayer(self.activate_function))
+        self.layers.append(layer.ConvolutionalLayer(num_input = 10,num_output = 12,kernel_size = 3,stride = 1))
+        self.layers.append(layer.PoolingLayer(kernel_size = 2, stride = 2, pool_type = 'MAX'))
+        self.layers.append(layer.ActivateLayer(self.activate_function))
+        self.layers.append(layer.FullyConnectedLayer(300,10))
+        # self.layers.append(layer.ActivateLayer(self.activate_function))
+        # self.layers.append(layer.FullyConnectedLayer(128,10))
+        self.layers.append(layer.ActivateLayer('softmax'))
+        self.layers.append(layer.OutputLayer())
+
+
+        # self.layers.append(layer.ConvolutionalLayer(num_input = 3,num_output = 10,kernel_size = 5,stride = 1))
         # self.layers.append(layer.PoolingLayer(kernel_size = 2, stride = 2, pool_type = 'MAX'))
         # self.layers.append(layer.ActivateLayer(self.activate_function))
-        # self.layers.append(layer.ConvolutionalLayer(num_input = 10,num_output = 12,kernel_size = 3,stride = 1))
+        # self.layers.append(layer.ConvolutionalLayer(num_input = 10,num_output = 12,kernel_size = 5,stride = 1))
         # self.layers.append(layer.PoolingLayer(kernel_size = 2, stride = 2, pool_type = 'MAX'))
         # self.layers.append(layer.ActivateLayer(self.activate_function))
         # self.layers.append(layer.FullyConnectedLayer(300,128))
@@ -34,19 +47,6 @@ class ConvolutionalNeuralNetwork(AbstractNeuralNetwork):
         # self.layers.append(layer.FullyConnectedLayer(128,10))
         # self.layers.append(layer.ActivateLayer('softmax'))
         # self.layers.append(layer.OutputLayer())
-
-
-        self.layers.append(layer.ConvolutionalLayer(num_input = 3,num_output = 10,kernel_size = 5,stride = 1))
-        self.layers.append(layer.PoolingLayer(kernel_size = 2, stride = 2, pool_type = 'MAX'))
-        self.layers.append(layer.ActivateLayer(self.activate_function))
-        self.layers.append(layer.ConvolutionalLayer(num_input = 10,num_output = 12,kernel_size = 5,stride = 1))
-        self.layers.append(layer.PoolingLayer(kernel_size = 2, stride = 2, pool_type = 'MAX'))
-        self.layers.append(layer.ActivateLayer(self.activate_function))
-        self.layers.append(layer.FullyConnectedLayer(300,128))
-        self.layers.append(layer.ActivateLayer(self.activate_function))
-        self.layers.append(layer.FullyConnectedLayer(128,10))
-        self.layers.append(layer.ActivateLayer('softmax'))
-        self.layers.append(layer.OutputLayer())
 
         self.layers_num = len(self.layers)
 
