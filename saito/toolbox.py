@@ -121,7 +121,7 @@ def load_language_model(datapath = '/data/ishimochi0/dataset/rnnlm-data'):
             test_txt.append(line_list[i])
 
     print '   making dictionary'
-    language_dictionary = []    
+    language_dictionary = []
     for i in xrange(len(train_txt)):
         if train_txt[i] not in language_dictionary:
             language_dictionary.append(train_txt[i])
