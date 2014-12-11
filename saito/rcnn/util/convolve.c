@@ -939,6 +939,8 @@ static CYTHON_INLINE int __Pyx_SetItemInt_Fast(PyObject *o, Py_ssize_t i, PyObje
   #define __PYX_FORCE_INIT_THREADS 0
 #endif
 
+static void __Pyx_RaiseBufferFallbackError(void);
+
 #define __Pyx_BufPtrStrided5d(type, buf, i0, s0, i1, s1, i2, s2, i3, s3, i4, s4) (type)((char*)buf + i0 * s0 + i1 * s1 + i2 * s2 + i3 * s3 + i4 * s4)
 static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
 
@@ -1165,7 +1167,7 @@ static PyObject *__pyx_pf_8convolve_4convolve3d_derr(CYTHON_UNUSED PyObject *__p
 static PyObject *__pyx_pf_8convolve_6convolve3d_dweight(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_a, PyArrayObject *__pyx_v_b, char *__pyx_v_mode, unsigned int __pyx_v_padding_x, unsigned int __pyx_v_padding_y, unsigned int __pyx_v_padding_flug, unsigned int __pyx_v_rotation); /* proto */
 static PyObject *__pyx_lambda_funcdef_lambda1(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_x); /* proto */
 static PyObject *__pyx_pf_8convolve_8convolve_recurrent(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_a, PyArrayObject *__pyx_v_b); /* proto */
-static PyObject *__pyx_pf_8convolve_10convolve_recurrent_backward(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_a, PyArrayObject *__pyx_v_b, unsigned int __pyx_v_padding_x, unsigned int __pyx_v_padding_y); /* proto */
+static PyObject *__pyx_pf_8convolve_10convolve_recurrent_backward(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_node, PyArrayObject *__pyx_v_derr, PyArrayObject *__pyx_v_weight, unsigned int __pyx_v_padding_x, unsigned int __pyx_v_padding_y); /* proto */
 static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_node, PyArrayObject *__pyx_v_weight, char *__pyx_v_mode, unsigned int __pyx_v_padding_x, unsigned int __pyx_v_padding_y, unsigned int __pyx_v_padding_z, unsigned int __pyx_v_padding_flug, unsigned int __pyx_v_rotation); /* proto */
 static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_next_derr, PyArrayObject *__pyx_v_weight, char *__pyx_v_mode, unsigned int __pyx_v_padding_x, unsigned int __pyx_v_padding_y, unsigned int __pyx_v_padding_z, unsigned int __pyx_v_padding_flug, unsigned int __pyx_v_rotation); /* proto */
 static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_node, PyArrayObject *__pyx_v_next_derr, char *__pyx_v_mode, unsigned int __pyx_v_padding_x, unsigned int __pyx_v_padding_y, unsigned int __pyx_v_padding_z, unsigned int __pyx_v_padding_flug, unsigned int __pyx_v_rotation); /* proto */
@@ -1233,6 +1235,7 @@ static char __pyx_k_xrange[] = "xrange";
 static char __pyx_k_dweight[] = "dweight";
 static char __pyx_k_float64[] = "float64";
 static char __pyx_k_convolve[] = "convolve";
+static char __pyx_k_new_derr[] = "new_derr";
 static char __pyx_k_rotation[] = "rotation";
 static char __pyx_k_NameError[] = "NameError";
 static char __pyx_k_next_derr[] = "next_derr";
@@ -1305,6 +1308,7 @@ static PyObject *__pyx_n_s_mode;
 static PyObject *__pyx_n_s_napier;
 static PyObject *__pyx_kp_u_ndarray_is_not_C_contiguous;
 static PyObject *__pyx_kp_u_ndarray_is_not_Fortran_contiguou;
+static PyObject *__pyx_n_s_new_derr;
 static PyObject *__pyx_n_s_next_derr;
 static PyObject *__pyx_n_s_next_node;
 static PyObject *__pyx_n_s_node;
@@ -4381,13 +4385,13 @@ static PyObject *__pyx_pf_8convolve_8convolve_recurrent(CYTHON_UNUSED PyObject *
         {
             unsigned int __pyx_parallel_temp0 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp1 = 0xbad0bad0;
-            int __pyx_parallel_temp2 = 0xbad0bad0;
+            unsigned int __pyx_parallel_temp2 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp3 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp4 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp5 = 0xbad0bad0;
             int __pyx_parallel_temp6 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp7 = 0xbad0bad0;
-            unsigned int __pyx_parallel_temp8 = 0xbad0bad0;
+            int __pyx_parallel_temp8 = 0xbad0bad0;
             const char *__pyx_parallel_filename = NULL; int __pyx_parallel_lineno = 0, __pyx_parallel_clineno = 0;
             PyObject *__pyx_parallel_exc_type = NULL, *__pyx_parallel_exc_value = NULL, *__pyx_parallel_exc_tb = NULL;
             int __pyx_parallel_why;
@@ -4402,7 +4406,7 @@ static PyObject *__pyx_pf_8convolve_8convolve_recurrent(CYTHON_UNUSED PyObject *
             if (__pyx_t_11 > 0)
             {
                 #ifdef _OPENMP
-                #pragma omp parallel private(__pyx_t_32, __pyx_t_19, __pyx_t_27, __pyx_t_35, __pyx_t_13, __pyx_t_29, __pyx_t_30, __pyx_t_40, __pyx_t_28, __pyx_t_24, __pyx_t_41, __pyx_t_16, __pyx_t_47, __pyx_t_18, __pyx_t_42, __pyx_t_34, __pyx_t_17, __pyx_t_21, __pyx_t_37, __pyx_t_45, __pyx_t_46, __pyx_t_22, __pyx_t_43, __pyx_t_44, __pyx_t_23, __pyx_t_38, __pyx_t_36, __pyx_t_33, __pyx_t_15, __pyx_t_39, __pyx_t_12, __pyx_t_14, __pyx_t_26, __pyx_t_31, __pyx_t_25, __pyx_t_48, __pyx_t_20) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
+                #pragma omp parallel private(__pyx_t_44, __pyx_t_29, __pyx_t_14, __pyx_t_33, __pyx_t_45, __pyx_t_20, __pyx_t_22, __pyx_t_39, __pyx_t_32, __pyx_t_21, __pyx_t_46, __pyx_t_41, __pyx_t_15, __pyx_t_17, __pyx_t_47, __pyx_t_31, __pyx_t_12, __pyx_t_28, __pyx_t_25, __pyx_t_27, __pyx_t_24, __pyx_t_37, __pyx_t_35, __pyx_t_30, __pyx_t_36, __pyx_t_42, __pyx_t_16, __pyx_t_19, __pyx_t_38, __pyx_t_43, __pyx_t_13, __pyx_t_18, __pyx_t_26, __pyx_t_23, __pyx_t_48, __pyx_t_34, __pyx_t_40) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
                 #endif /* _OPENMP */
                 {
                     #ifdef _OPENMP
@@ -4412,21 +4416,21 @@ static PyObject *__pyx_pf_8convolve_8convolve_recurrent(CYTHON_UNUSED PyObject *
                     Py_BEGIN_ALLOW_THREADS
                     #endif /* _OPENMP */
                     #ifdef _OPENMP
-                    #pragma omp for lastprivate(__pyx_v_col) lastprivate(__pyx_v_row) lastprivate(__pyx_v_a_x) lastprivate(__pyx_v_m) lastprivate(__pyx_v_l) lastprivate(__pyx_v_k) lastprivate(__pyx_v_a_y) lastprivate(__pyx_v_j) firstprivate(__pyx_v_i) lastprivate(__pyx_v_i)
+                    #pragma omp for lastprivate(__pyx_v_k) lastprivate(__pyx_v_j) firstprivate(__pyx_v_i) lastprivate(__pyx_v_i) lastprivate(__pyx_v_col) lastprivate(__pyx_v_row) lastprivate(__pyx_v_m) lastprivate(__pyx_v_a_x) lastprivate(__pyx_v_l) lastprivate(__pyx_v_a_y)
                     #endif /* _OPENMP */
                     for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_11; __pyx_t_10++){
                         if (__pyx_parallel_why < 2)
                         {
                             __pyx_v_i = 0 + 1 * __pyx_t_10;
                             /* Initialize private variables to invalid values */
+                            __pyx_v_k = ((unsigned int)0xbad0bad0);
+                            __pyx_v_j = ((unsigned int)0xbad0bad0);
                             __pyx_v_col = ((unsigned int)0xbad0bad0);
                             __pyx_v_row = ((unsigned int)0xbad0bad0);
-                            __pyx_v_a_x = ((int)0xbad0bad0);
                             __pyx_v_m = ((unsigned int)0xbad0bad0);
+                            __pyx_v_a_x = ((int)0xbad0bad0);
                             __pyx_v_l = ((unsigned int)0xbad0bad0);
-                            __pyx_v_k = ((unsigned int)0xbad0bad0);
                             __pyx_v_a_y = ((int)0xbad0bad0);
-                            __pyx_v_j = ((unsigned int)0xbad0bad0);
 
                             /* "convolve.pyx":164
  *     for i in prange(a.shape[0] - 1, nogil = True):
@@ -4728,15 +4732,15 @@ static PyObject *__pyx_pf_8convolve_8convolve_recurrent(CYTHON_UNUSED PyObject *
                             #pragma omp critical(__pyx_parallel_lastprivates0)
                             #endif /* _OPENMP */
                             {
-                                __pyx_parallel_temp0 = __pyx_v_col;
-                                __pyx_parallel_temp1 = __pyx_v_row;
-                                __pyx_parallel_temp2 = __pyx_v_a_x;
-                                __pyx_parallel_temp3 = __pyx_v_m;
-                                __pyx_parallel_temp4 = __pyx_v_l;
-                                __pyx_parallel_temp5 = __pyx_v_k;
-                                __pyx_parallel_temp6 = __pyx_v_a_y;
-                                __pyx_parallel_temp7 = __pyx_v_j;
-                                __pyx_parallel_temp8 = __pyx_v_i;
+                                __pyx_parallel_temp0 = __pyx_v_k;
+                                __pyx_parallel_temp1 = __pyx_v_j;
+                                __pyx_parallel_temp2 = __pyx_v_i;
+                                __pyx_parallel_temp3 = __pyx_v_col;
+                                __pyx_parallel_temp4 = __pyx_v_row;
+                                __pyx_parallel_temp5 = __pyx_v_m;
+                                __pyx_parallel_temp6 = __pyx_v_a_x;
+                                __pyx_parallel_temp7 = __pyx_v_l;
+                                __pyx_parallel_temp8 = __pyx_v_a_y;
                             }
                             __pyx_L40:;
                             #ifdef _OPENMP
@@ -4766,15 +4770,15 @@ static PyObject *__pyx_pf_8convolve_8convolve_recurrent(CYTHON_UNUSED PyObject *
               __pyx_parallel_why = 4;
             }
             if (__pyx_parallel_why) {
-              __pyx_v_col = __pyx_parallel_temp0;
-              __pyx_v_row = __pyx_parallel_temp1;
-              __pyx_v_a_x = __pyx_parallel_temp2;
-              __pyx_v_m = __pyx_parallel_temp3;
-              __pyx_v_l = __pyx_parallel_temp4;
-              __pyx_v_k = __pyx_parallel_temp5;
-              __pyx_v_a_y = __pyx_parallel_temp6;
-              __pyx_v_j = __pyx_parallel_temp7;
-              __pyx_v_i = __pyx_parallel_temp8;
+              __pyx_v_k = __pyx_parallel_temp0;
+              __pyx_v_j = __pyx_parallel_temp1;
+              __pyx_v_i = __pyx_parallel_temp2;
+              __pyx_v_col = __pyx_parallel_temp3;
+              __pyx_v_row = __pyx_parallel_temp4;
+              __pyx_v_m = __pyx_parallel_temp5;
+              __pyx_v_a_x = __pyx_parallel_temp6;
+              __pyx_v_l = __pyx_parallel_temp7;
+              __pyx_v_a_y = __pyx_parallel_temp8;
               switch (__pyx_parallel_why) {
                     case 3: goto __pyx_L3_return;
                     case 4:
@@ -4883,17 +4887,18 @@ static PyObject *__pyx_pf_8convolve_8convolve_recurrent(CYTHON_UNUSED PyObject *
 /* "convolve.pyx":186
  * 
  * @cython.boundscheck(False)
- * def convolve_recurrent_backward(np.ndarray[DTYPE_t, ndim = 4] a, np.ndarray[DTYPE_t, ndim = 4] b, unsigned int padding_x, unsigned int padding_y):             # <<<<<<<<<<<<<<
+ * def convolve_recurrent_backward(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 4] derr, np.ndarray[DTYPE_t,ndim=4] weight, unsigned int padding_x, unsigned int padding_y):             # <<<<<<<<<<<<<<
  * 
- *     cdef unsigned int i,j,k,l,m,row,col
+ *     cdef unsigned int i,j,k,l,m,row,col,x,y
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_8convolve_11convolve_recurrent_backward(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static PyMethodDef __pyx_mdef_8convolve_11convolve_recurrent_backward = {"convolve_recurrent_backward", (PyCFunction)__pyx_pw_8convolve_11convolve_recurrent_backward, METH_VARARGS|METH_KEYWORDS, 0};
 static PyObject *__pyx_pw_8convolve_11convolve_recurrent_backward(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyArrayObject *__pyx_v_a = 0;
-  PyArrayObject *__pyx_v_b = 0;
+  PyArrayObject *__pyx_v_node = 0;
+  PyArrayObject *__pyx_v_derr = 0;
+  PyArrayObject *__pyx_v_weight = 0;
   unsigned int __pyx_v_padding_x;
   unsigned int __pyx_v_padding_y;
   int __pyx_lineno = 0;
@@ -4903,12 +4908,13 @@ static PyObject *__pyx_pw_8convolve_11convolve_recurrent_backward(PyObject *__py
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("convolve_recurrent_backward (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_a,&__pyx_n_s_b,&__pyx_n_s_padding_x,&__pyx_n_s_padding_y,0};
-    PyObject* values[4] = {0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_node,&__pyx_n_s_derr,&__pyx_n_s_weight,&__pyx_n_s_padding_x,&__pyx_n_s_padding_y,0};
+    PyObject* values[5] = {0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
         case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
         case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
@@ -4919,51 +4925,59 @@ static PyObject *__pyx_pw_8convolve_11convolve_recurrent_backward(PyObject *__py
       kw_args = PyDict_Size(__pyx_kwds);
       switch (pos_args) {
         case  0:
-        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_a)) != 0)) kw_args--;
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_node)) != 0)) kw_args--;
         else goto __pyx_L5_argtuple_error;
         case  1:
-        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_b)) != 0)) kw_args--;
+        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_derr)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("convolve_recurrent_backward", 1, 4, 4, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("convolve_recurrent_backward", 1, 5, 5, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
-        if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_padding_x)) != 0)) kw_args--;
+        if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_weight)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("convolve_recurrent_backward", 1, 4, 4, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("convolve_recurrent_backward", 1, 5, 5, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  3:
-        if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_padding_y)) != 0)) kw_args--;
+        if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_padding_x)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("convolve_recurrent_backward", 1, 4, 4, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("convolve_recurrent_backward", 1, 5, 5, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        }
+        case  4:
+        if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_padding_y)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("convolve_recurrent_backward", 1, 5, 5, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "convolve_recurrent_backward") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+      values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
     }
-    __pyx_v_a = ((PyArrayObject *)values[0]);
-    __pyx_v_b = ((PyArrayObject *)values[1]);
-    __pyx_v_padding_x = __Pyx_PyInt_As_unsigned_int(values[2]); if (unlikely((__pyx_v_padding_x == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_padding_y = __Pyx_PyInt_As_unsigned_int(values[3]); if (unlikely((__pyx_v_padding_y == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_node = ((PyArrayObject *)values[0]);
+    __pyx_v_derr = ((PyArrayObject *)values[1]);
+    __pyx_v_weight = ((PyArrayObject *)values[2]);
+    __pyx_v_padding_x = __Pyx_PyInt_As_unsigned_int(values[3]); if (unlikely((__pyx_v_padding_x == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_padding_y = __Pyx_PyInt_As_unsigned_int(values[4]); if (unlikely((__pyx_v_padding_y == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("convolve_recurrent_backward", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("convolve_recurrent_backward", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("convolve.convolve_recurrent_backward", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_a), __pyx_ptype_5numpy_ndarray, 1, "a", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_b), __pyx_ptype_5numpy_ndarray, 1, "b", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_8convolve_10convolve_recurrent_backward(__pyx_self, __pyx_v_a, __pyx_v_b, __pyx_v_padding_x, __pyx_v_padding_y);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_node), __pyx_ptype_5numpy_ndarray, 1, "node", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_derr), __pyx_ptype_5numpy_ndarray, 1, "derr", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_weight), __pyx_ptype_5numpy_ndarray, 1, "weight", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_8convolve_10convolve_recurrent_backward(__pyx_self, __pyx_v_node, __pyx_v_derr, __pyx_v_weight, __pyx_v_padding_x, __pyx_v_padding_y);
 
   /* function exit code */
   goto __pyx_L0;
@@ -4974,7 +4988,7 @@ static PyObject *__pyx_pw_8convolve_11convolve_recurrent_backward(PyObject *__py
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8convolve_10convolve_recurrent_backward(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_a, PyArrayObject *__pyx_v_b, unsigned int __pyx_v_padding_x, unsigned int __pyx_v_padding_y) {
+static PyObject *__pyx_pf_8convolve_10convolve_recurrent_backward(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_node, PyArrayObject *__pyx_v_derr, PyArrayObject *__pyx_v_weight, unsigned int __pyx_v_padding_x, unsigned int __pyx_v_padding_y) {
   unsigned int __pyx_v_i;
   unsigned int __pyx_v_j;
   unsigned int __pyx_v_k;
@@ -4982,17 +4996,24 @@ static PyObject *__pyx_pf_8convolve_10convolve_recurrent_backward(CYTHON_UNUSED 
   unsigned int __pyx_v_m;
   unsigned int __pyx_v_row;
   unsigned int __pyx_v_col;
+  unsigned int __pyx_v_x;
+  unsigned int __pyx_v_y;
   unsigned int __pyx_v_out_x;
   unsigned int __pyx_v_out_y;
   PyArrayObject *__pyx_v_ret = 0;
+  PyArrayObject *__pyx_v_new_derr = 0;
   int __pyx_v_a_x;
   int __pyx_v_a_y;
-  __Pyx_LocalBuf_ND __pyx_pybuffernd_a;
-  __Pyx_Buffer __pyx_pybuffer_a;
-  __Pyx_LocalBuf_ND __pyx_pybuffernd_b;
-  __Pyx_Buffer __pyx_pybuffer_b;
+  __Pyx_LocalBuf_ND __pyx_pybuffernd_derr;
+  __Pyx_Buffer __pyx_pybuffer_derr;
+  __Pyx_LocalBuf_ND __pyx_pybuffernd_new_derr;
+  __Pyx_Buffer __pyx_pybuffer_new_derr;
+  __Pyx_LocalBuf_ND __pyx_pybuffernd_node;
+  __Pyx_Buffer __pyx_pybuffer_node;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_ret;
   __Pyx_Buffer __pyx_pybuffer_ret;
+  __Pyx_LocalBuf_ND __pyx_pybuffernd_weight;
+  __Pyx_Buffer __pyx_pybuffer_weight;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5003,87 +5024,132 @@ static PyObject *__pyx_pf_8convolve_10convolve_recurrent_backward(CYTHON_UNUSED 
   PyObject *__pyx_t_6 = NULL;
   PyObject *__pyx_t_7 = NULL;
   PyArrayObject *__pyx_t_8 = NULL;
-  npy_intp __pyx_t_9;
-  unsigned int __pyx_t_10;
+  PyArrayObject *__pyx_t_9 = NULL;
+  npy_intp __pyx_t_10;
   unsigned int __pyx_t_11;
-  npy_intp __pyx_t_12;
-  unsigned int __pyx_t_13;
-  long __pyx_t_14;
-  unsigned int __pyx_t_15;
+  unsigned int __pyx_t_12;
+  npy_intp __pyx_t_13;
+  unsigned int __pyx_t_14;
+  long __pyx_t_15;
   unsigned int __pyx_t_16;
-  unsigned int __pyx_t_17;
+  npy_intp __pyx_t_17;
   unsigned int __pyx_t_18;
-  unsigned int __pyx_t_19;
-  npy_intp __pyx_t_20;
-  unsigned int __pyx_t_21;
-  npy_intp __pyx_t_22;
-  unsigned int __pyx_t_23;
-  int __pyx_t_24;
+  npy_intp __pyx_t_19;
+  unsigned int __pyx_t_20;
+  npy_intp __pyx_t_21;
+  unsigned int __pyx_t_22;
+  npy_intp __pyx_t_23;
+  unsigned int __pyx_t_24;
   int __pyx_t_25;
-  unsigned int __pyx_t_26;
-  int __pyx_t_27;
+  int __pyx_t_26;
+  long __pyx_t_27;
   int __pyx_t_28;
-  unsigned int __pyx_t_29;
-  long __pyx_t_30;
+  int __pyx_t_29;
+  unsigned int __pyx_t_30;
   unsigned int __pyx_t_31;
   unsigned int __pyx_t_32;
-  unsigned int __pyx_t_33;
-  unsigned int __pyx_t_34;
-  unsigned int __pyx_t_35;
+  long __pyx_t_33;
+  long __pyx_t_34;
+  long __pyx_t_35;
   unsigned int __pyx_t_36;
   unsigned int __pyx_t_37;
+  unsigned int __pyx_t_38;
+  long __pyx_t_39;
+  unsigned int __pyx_t_40;
+  long __pyx_t_41;
+  unsigned int __pyx_t_42;
+  unsigned int __pyx_t_43;
+  unsigned int __pyx_t_44;
+  long __pyx_t_45;
+  unsigned int __pyx_t_46;
+  unsigned int __pyx_t_47;
+  unsigned int __pyx_t_48;
+  PyArrayObject *__pyx_t_49 = NULL;
+  int __pyx_t_50;
+  PyObject *__pyx_t_51 = NULL;
+  PyObject *__pyx_t_52 = NULL;
+  PyObject *__pyx_t_53 = NULL;
+  unsigned int __pyx_t_54;
+  unsigned int __pyx_t_55;
+  unsigned int __pyx_t_56;
+  unsigned int __pyx_t_57;
+  unsigned int __pyx_t_58;
+  int __pyx_t_59;
+  unsigned int __pyx_t_60;
+  long __pyx_t_61;
+  unsigned int __pyx_t_62;
+  unsigned int __pyx_t_63;
+  unsigned int __pyx_t_64;
+  unsigned int __pyx_t_65;
+  unsigned int __pyx_t_66;
+  unsigned int __pyx_t_67;
+  unsigned int __pyx_t_68;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("convolve_recurrent_backward", 0);
+  __Pyx_INCREF((PyObject *)__pyx_v_derr);
   __pyx_pybuffer_ret.pybuffer.buf = NULL;
   __pyx_pybuffer_ret.refcount = 0;
   __pyx_pybuffernd_ret.data = NULL;
   __pyx_pybuffernd_ret.rcbuffer = &__pyx_pybuffer_ret;
-  __pyx_pybuffer_a.pybuffer.buf = NULL;
-  __pyx_pybuffer_a.refcount = 0;
-  __pyx_pybuffernd_a.data = NULL;
-  __pyx_pybuffernd_a.rcbuffer = &__pyx_pybuffer_a;
-  __pyx_pybuffer_b.pybuffer.buf = NULL;
-  __pyx_pybuffer_b.refcount = 0;
-  __pyx_pybuffernd_b.data = NULL;
-  __pyx_pybuffernd_b.rcbuffer = &__pyx_pybuffer_b;
+  __pyx_pybuffer_new_derr.pybuffer.buf = NULL;
+  __pyx_pybuffer_new_derr.refcount = 0;
+  __pyx_pybuffernd_new_derr.data = NULL;
+  __pyx_pybuffernd_new_derr.rcbuffer = &__pyx_pybuffer_new_derr;
+  __pyx_pybuffer_node.pybuffer.buf = NULL;
+  __pyx_pybuffer_node.refcount = 0;
+  __pyx_pybuffernd_node.data = NULL;
+  __pyx_pybuffernd_node.rcbuffer = &__pyx_pybuffer_node;
+  __pyx_pybuffer_derr.pybuffer.buf = NULL;
+  __pyx_pybuffer_derr.refcount = 0;
+  __pyx_pybuffernd_derr.data = NULL;
+  __pyx_pybuffernd_derr.rcbuffer = &__pyx_pybuffer_derr;
+  __pyx_pybuffer_weight.pybuffer.buf = NULL;
+  __pyx_pybuffer_weight.refcount = 0;
+  __pyx_pybuffernd_weight.data = NULL;
+  __pyx_pybuffernd_weight.rcbuffer = &__pyx_pybuffer_weight;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_a.rcbuffer->pybuffer, (PyObject*)__pyx_v_a, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_node.rcbuffer->pybuffer, (PyObject*)__pyx_v_node, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_pybuffernd_a.diminfo[0].strides = __pyx_pybuffernd_a.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_a.diminfo[0].shape = __pyx_pybuffernd_a.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_a.diminfo[1].strides = __pyx_pybuffernd_a.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_a.diminfo[1].shape = __pyx_pybuffernd_a.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_a.diminfo[2].strides = __pyx_pybuffernd_a.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_a.diminfo[2].shape = __pyx_pybuffernd_a.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_a.diminfo[3].strides = __pyx_pybuffernd_a.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_a.diminfo[3].shape = __pyx_pybuffernd_a.rcbuffer->pybuffer.shape[3];
+  __pyx_pybuffernd_node.diminfo[0].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_node.diminfo[0].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_node.diminfo[1].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_node.diminfo[1].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_node.diminfo[2].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_node.diminfo[2].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_node.diminfo[3].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_node.diminfo[3].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[3];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_b.rcbuffer->pybuffer, (PyObject*)__pyx_v_b, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_derr.rcbuffer->pybuffer, (PyObject*)__pyx_v_derr, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_pybuffernd_b.diminfo[0].strides = __pyx_pybuffernd_b.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_b.diminfo[0].shape = __pyx_pybuffernd_b.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_b.diminfo[1].strides = __pyx_pybuffernd_b.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_b.diminfo[1].shape = __pyx_pybuffernd_b.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_b.diminfo[2].strides = __pyx_pybuffernd_b.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_b.diminfo[2].shape = __pyx_pybuffernd_b.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_b.diminfo[3].strides = __pyx_pybuffernd_b.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_b.diminfo[3].shape = __pyx_pybuffernd_b.rcbuffer->pybuffer.shape[3];
+  __pyx_pybuffernd_derr.diminfo[0].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_derr.diminfo[0].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_derr.diminfo[1].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_derr.diminfo[1].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_derr.diminfo[2].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_derr.diminfo[2].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_derr.diminfo[3].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_derr.diminfo[3].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[3];
+  {
+    __Pyx_BufFmt_StackElem __pyx_stack[1];
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_weight.rcbuffer->pybuffer, (PyObject*)__pyx_v_weight, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_pybuffernd_weight.diminfo[0].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_weight.diminfo[0].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_weight.diminfo[1].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_weight.diminfo[1].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_weight.diminfo[2].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_weight.diminfo[2].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_weight.diminfo[3].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_weight.diminfo[3].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[3];
 
   /* "convolve.pyx":189
  * 
- *     cdef unsigned int i,j,k,l,m,row,col
+ *     cdef unsigned int i,j,k,l,m,row,col,x,y
  *     cdef unsigned int out_x = padding_x * 2 + 1, out_y = padding_y * 2 + 1             # <<<<<<<<<<<<<<
- *     cdef np.ndarray[DTYPE_t, ndim=4] ret = np.zeros((a.shape[3],a.shape[3],out_x, out_y))
- * 
+ *     cdef np.ndarray[DTYPE_t, ndim=4] ret = np.zeros((node.shape[3],node.shape[3],out_x, out_y))
+ *     cdef np.ndarray[DTYPE_t, ndim=4] new_derr = np.zeros((derr.shape[0],derr.shape[1],derr.shape[2],derr.shape[3]))
  */
   __pyx_v_out_x = ((__pyx_v_padding_x * 2) + 1);
   __pyx_v_out_y = ((__pyx_v_padding_y * 2) + 1);
 
   /* "convolve.pyx":190
- *     cdef unsigned int i,j,k,l,m,row,col
+ *     cdef unsigned int i,j,k,l,m,row,col,x,y
  *     cdef unsigned int out_x = padding_x * 2 + 1, out_y = padding_y * 2 + 1
- *     cdef np.ndarray[DTYPE_t, ndim=4] ret = np.zeros((a.shape[3],a.shape[3],out_x, out_y))             # <<<<<<<<<<<<<<
+ *     cdef np.ndarray[DTYPE_t, ndim=4] ret = np.zeros((node.shape[3],node.shape[3],out_x, out_y))             # <<<<<<<<<<<<<<
+ *     cdef np.ndarray[DTYPE_t, ndim=4] new_derr = np.zeros((derr.shape[0],derr.shape[1],derr.shape[2],derr.shape[3]))
  * 
- *     cdef int a_x, a_y
  */
   __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_a->dimensions[3])); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_node->dimensions[3])); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_a->dimensions[3])); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_node->dimensions[3])); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_x); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
@@ -5143,12 +5209,86 @@ static PyObject *__pyx_pf_8convolve_10convolve_recurrent_backward(CYTHON_UNUSED 
   __pyx_v_ret = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "convolve.pyx":194
- *     cdef int a_x, a_y
+  /* "convolve.pyx":191
+ *     cdef unsigned int out_x = padding_x * 2 + 1, out_y = padding_y * 2 + 1
+ *     cdef np.ndarray[DTYPE_t, ndim=4] ret = np.zeros((node.shape[3],node.shape[3],out_x, out_y))
+ *     cdef np.ndarray[DTYPE_t, ndim=4] new_derr = np.zeros((derr.shape[0],derr.shape[1],derr.shape[2],derr.shape[3]))             # <<<<<<<<<<<<<<
  * 
- *     for i in prange(a.shape[3], nogil=True):             # <<<<<<<<<<<<<<
- *         for j in xrange(a.shape[3]):
- *             for k in xrange(a.shape[0] - 1):
+ *     cdef int a_x, a_y
+ */
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_derr->dimensions[0])); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_7 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_derr->dimensions[1])); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_6 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_derr->dimensions[2])); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_4 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_derr->dimensions[3])); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_t_7);
+  __Pyx_GIVEREF(__pyx_t_7);
+  PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_t_6);
+  __Pyx_GIVEREF(__pyx_t_6);
+  PyTuple_SET_ITEM(__pyx_t_2, 3, __pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_4);
+  __pyx_t_3 = 0;
+  __pyx_t_7 = 0;
+  __pyx_t_6 = 0;
+  __pyx_t_4 = 0;
+  __pyx_t_4 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_5))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_5);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_5, function);
+    }
+  }
+  if (!__pyx_t_4) {
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_GOTREF(__pyx_t_1);
+  } else {
+    __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_6);
+    PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __Pyx_GIVEREF(__pyx_t_4); __pyx_t_4 = NULL;
+    PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_2);
+    __Pyx_GIVEREF(__pyx_t_2);
+    __pyx_t_2 = 0;
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_9 = ((PyArrayObject *)__pyx_t_1);
+  {
+    __Pyx_BufFmt_StackElem __pyx_stack[1];
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_new_derr.rcbuffer->pybuffer, (PyObject*)__pyx_t_9, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 4, 0, __pyx_stack) == -1)) {
+      __pyx_v_new_derr = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_new_derr.rcbuffer->pybuffer.buf = NULL;
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    } else {__pyx_pybuffernd_new_derr.diminfo[0].strides = __pyx_pybuffernd_new_derr.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_new_derr.diminfo[0].shape = __pyx_pybuffernd_new_derr.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_new_derr.diminfo[1].strides = __pyx_pybuffernd_new_derr.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_new_derr.diminfo[1].shape = __pyx_pybuffernd_new_derr.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_new_derr.diminfo[2].strides = __pyx_pybuffernd_new_derr.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_new_derr.diminfo[2].shape = __pyx_pybuffernd_new_derr.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_new_derr.diminfo[3].strides = __pyx_pybuffernd_new_derr.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_new_derr.diminfo[3].shape = __pyx_pybuffernd_new_derr.rcbuffer->pybuffer.shape[3];
+    }
+  }
+  __pyx_t_9 = 0;
+  __pyx_v_new_derr = ((PyArrayObject *)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "convolve.pyx":194
+ * 
+ *     cdef int a_x, a_y
+ *     for i in prange(derr.shape[3],nogil=True):             # <<<<<<<<<<<<<<
+ *         for j in xrange(derr.shape[3]):
+ *             for k in xrange(derr.shape[0] - 1):
  */
   {
       #ifdef WITH_THREAD
@@ -5156,7 +5296,7 @@ static PyObject *__pyx_pf_8convolve_10convolve_recurrent_backward(CYTHON_UNUSED 
       Py_UNBLOCK_THREADS
       #endif
       /*try:*/ {
-        __pyx_t_9 = (__pyx_v_a->dimensions[3]);
+        __pyx_t_10 = (__pyx_v_derr->dimensions[3]);
         if (1 == 0) abort();
         {
             #if ((defined(__APPLE__) || defined(__OSX__)) && (defined(__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && (__GNUC_MINOR__ > 95)))))
@@ -5165,183 +5305,477 @@ static PyObject *__pyx_pf_8convolve_10convolve_recurrent_backward(CYTHON_UNUSED 
                 #define likely(x)   (x)
                 #define unlikely(x) (x)
             #endif
-            __pyx_t_11 = (__pyx_t_9 - 0) / 1;
-            if (__pyx_t_11 > 0)
+            __pyx_t_12 = (__pyx_t_10 - 0) / 1;
+            if (__pyx_t_12 > 0)
             {
                 #ifdef _OPENMP
-                #pragma omp parallel private(__pyx_t_32, __pyx_t_19, __pyx_t_30, __pyx_t_35, __pyx_t_13, __pyx_t_29, __pyx_t_21, __pyx_t_18, __pyx_t_20, __pyx_t_34, __pyx_t_31, __pyx_t_17, __pyx_t_25, __pyx_t_22, __pyx_t_24, __pyx_t_28, __pyx_t_27, __pyx_t_16, __pyx_t_36, __pyx_t_33, __pyx_t_15, __pyx_t_12, __pyx_t_23, __pyx_t_26, __pyx_t_14, __pyx_t_37)
+                #pragma omp parallel private(__pyx_t_40, __pyx_t_27, __pyx_t_19, __pyx_t_45, __pyx_t_25, __pyx_t_20, __pyx_t_22, __pyx_t_13, __pyx_t_32, __pyx_t_41, __pyx_t_29, __pyx_t_21, __pyx_t_46, __pyx_t_44, __pyx_t_26, __pyx_t_47, __pyx_t_35, __pyx_t_31, __pyx_t_42, __pyx_t_38, __pyx_t_17, __pyx_t_34, __pyx_t_16, __pyx_t_24, __pyx_t_37, __pyx_t_30, __pyx_t_33, __pyx_t_36, __pyx_t_15, __pyx_t_39, __pyx_t_48, __pyx_t_43, __pyx_t_14, __pyx_t_18, __pyx_t_23, __pyx_t_28)
                 #endif /* _OPENMP */
                 {
                     #ifdef _OPENMP
-                    #pragma omp for lastprivate(__pyx_v_a_y) lastprivate(__pyx_v_col) lastprivate(__pyx_v_row) lastprivate(__pyx_v_l) lastprivate(__pyx_v_k) lastprivate(__pyx_v_j) lastprivate(__pyx_v_m) firstprivate(__pyx_v_i) lastprivate(__pyx_v_i) lastprivate(__pyx_v_a_x)
+                    #pragma omp for lastprivate(__pyx_v_x) lastprivate(__pyx_v_k) lastprivate(__pyx_v_y) lastprivate(__pyx_v_col) lastprivate(__pyx_v_a_x) lastprivate(__pyx_v_j) lastprivate(__pyx_v_row) firstprivate(__pyx_v_i) lastprivate(__pyx_v_i) lastprivate(__pyx_v_a_y)
                     #endif /* _OPENMP */
-                    for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_11; __pyx_t_10++){
+                    for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_12; __pyx_t_11++){
                         {
-                            __pyx_v_i = 0 + 1 * __pyx_t_10;
+                            __pyx_v_i = 0 + 1 * __pyx_t_11;
                             /* Initialize private variables to invalid values */
-                            __pyx_v_a_y = ((int)0xbad0bad0);
-                            __pyx_v_col = ((unsigned int)0xbad0bad0);
-                            __pyx_v_row = ((unsigned int)0xbad0bad0);
-                            __pyx_v_l = ((unsigned int)0xbad0bad0);
+                            __pyx_v_x = ((unsigned int)0xbad0bad0);
                             __pyx_v_k = ((unsigned int)0xbad0bad0);
-                            __pyx_v_j = ((unsigned int)0xbad0bad0);
-                            __pyx_v_m = ((unsigned int)0xbad0bad0);
+                            __pyx_v_y = ((unsigned int)0xbad0bad0);
+                            __pyx_v_col = ((unsigned int)0xbad0bad0);
                             __pyx_v_a_x = ((int)0xbad0bad0);
+                            __pyx_v_j = ((unsigned int)0xbad0bad0);
+                            __pyx_v_row = ((unsigned int)0xbad0bad0);
+                            __pyx_v_a_y = ((int)0xbad0bad0);
 
                             /* "convolve.pyx":195
- * 
- *     for i in prange(a.shape[3], nogil=True):
- *         for j in xrange(a.shape[3]):             # <<<<<<<<<<<<<<
- *             for k in xrange(a.shape[0] - 1):
- *                 for l in xrange(out_x):
+ *     cdef int a_x, a_y
+ *     for i in prange(derr.shape[3],nogil=True):
+ *         for j in xrange(derr.shape[3]):             # <<<<<<<<<<<<<<
+ *             for k in xrange(derr.shape[0] - 1):
+ *                 for x in xrange(derr.shape[1]):
  */
-                            __pyx_t_12 = (__pyx_v_a->dimensions[3]);
-                            for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_12; __pyx_t_13+=1) {
-                              __pyx_v_j = __pyx_t_13;
+                            __pyx_t_13 = (__pyx_v_derr->dimensions[3]);
+                            for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
+                              __pyx_v_j = __pyx_t_14;
 
                               /* "convolve.pyx":196
- *     for i in prange(a.shape[3], nogil=True):
- *         for j in xrange(a.shape[3]):
- *             for k in xrange(a.shape[0] - 1):             # <<<<<<<<<<<<<<
- *                 for l in xrange(out_x):
- *                     for m in xrange(out_y):
+ *     for i in prange(derr.shape[3],nogil=True):
+ *         for j in xrange(derr.shape[3]):
+ *             for k in xrange(derr.shape[0] - 1):             # <<<<<<<<<<<<<<
+ *                 for x in xrange(derr.shape[1]):
+ *                     for y in xrange(derr.shape[2]):
  */
-                              __pyx_t_14 = ((__pyx_v_a->dimensions[0]) - 1);
-                              for (__pyx_t_15 = 0; __pyx_t_15 < __pyx_t_14; __pyx_t_15+=1) {
-                                __pyx_v_k = __pyx_t_15;
+                              __pyx_t_15 = ((__pyx_v_derr->dimensions[0]) - 1);
+                              for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
+                                __pyx_v_k = __pyx_t_16;
 
                                 /* "convolve.pyx":197
- *         for j in xrange(a.shape[3]):
- *             for k in xrange(a.shape[0] - 1):
- *                 for l in xrange(out_x):             # <<<<<<<<<<<<<<
- *                     for m in xrange(out_y):
- *                         for row in xrange(b.shape[1]):
+ *         for j in xrange(derr.shape[3]):
+ *             for k in xrange(derr.shape[0] - 1):
+ *                 for x in xrange(derr.shape[1]):             # <<<<<<<<<<<<<<
+ *                     for y in xrange(derr.shape[2]):
+ *                         for row in xrange(weight.shape[2]):
  */
-                                __pyx_t_16 = __pyx_v_out_x;
-                                for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
-                                  __pyx_v_l = __pyx_t_17;
+                                __pyx_t_17 = (__pyx_v_derr->dimensions[1]);
+                                for (__pyx_t_18 = 0; __pyx_t_18 < __pyx_t_17; __pyx_t_18+=1) {
+                                  __pyx_v_x = __pyx_t_18;
 
                                   /* "convolve.pyx":198
- *             for k in xrange(a.shape[0] - 1):
- *                 for l in xrange(out_x):
- *                     for m in xrange(out_y):             # <<<<<<<<<<<<<<
- *                         for row in xrange(b.shape[1]):
- *                             for col in xrange(b.shape[2]):
+ *             for k in xrange(derr.shape[0] - 1):
+ *                 for x in xrange(derr.shape[1]):
+ *                     for y in xrange(derr.shape[2]):             # <<<<<<<<<<<<<<
+ *                         for row in xrange(weight.shape[2]):
+ *                             for col in xrange(weight.shape[3]):
  */
-                                  __pyx_t_18 = __pyx_v_out_y;
-                                  for (__pyx_t_19 = 0; __pyx_t_19 < __pyx_t_18; __pyx_t_19+=1) {
-                                    __pyx_v_m = __pyx_t_19;
+                                  __pyx_t_19 = (__pyx_v_derr->dimensions[2]);
+                                  for (__pyx_t_20 = 0; __pyx_t_20 < __pyx_t_19; __pyx_t_20+=1) {
+                                    __pyx_v_y = __pyx_t_20;
 
                                     /* "convolve.pyx":199
- *                 for l in xrange(out_x):
- *                     for m in xrange(out_y):
- *                         for row in xrange(b.shape[1]):             # <<<<<<<<<<<<<<
- *                             for col in xrange(b.shape[2]):
- *                                 a_x = l+row-padding_x
+ *                 for x in xrange(derr.shape[1]):
+ *                     for y in xrange(derr.shape[2]):
+ *                         for row in xrange(weight.shape[2]):             # <<<<<<<<<<<<<<
+ *                             for col in xrange(weight.shape[3]):
+ *                                 a_x = x+row-padding_x
  */
-                                    __pyx_t_20 = (__pyx_v_b->dimensions[1]);
-                                    for (__pyx_t_21 = 0; __pyx_t_21 < __pyx_t_20; __pyx_t_21+=1) {
-                                      __pyx_v_row = __pyx_t_21;
+                                    __pyx_t_21 = (__pyx_v_weight->dimensions[2]);
+                                    for (__pyx_t_22 = 0; __pyx_t_22 < __pyx_t_21; __pyx_t_22+=1) {
+                                      __pyx_v_row = __pyx_t_22;
 
                                       /* "convolve.pyx":200
- *                     for m in xrange(out_y):
- *                         for row in xrange(b.shape[1]):
- *                             for col in xrange(b.shape[2]):             # <<<<<<<<<<<<<<
- *                                 a_x = l+row-padding_x
- *                                 a_y = m+col-padding_y
+ *                     for y in xrange(derr.shape[2]):
+ *                         for row in xrange(weight.shape[2]):
+ *                             for col in xrange(weight.shape[3]):             # <<<<<<<<<<<<<<
+ *                                 a_x = x+row-padding_x
+ *                                 a_y = y+col-padding_y
  */
-                                      __pyx_t_22 = (__pyx_v_b->dimensions[2]);
-                                      for (__pyx_t_23 = 0; __pyx_t_23 < __pyx_t_22; __pyx_t_23+=1) {
-                                        __pyx_v_col = __pyx_t_23;
+                                      __pyx_t_23 = (__pyx_v_weight->dimensions[3]);
+                                      for (__pyx_t_24 = 0; __pyx_t_24 < __pyx_t_23; __pyx_t_24+=1) {
+                                        __pyx_v_col = __pyx_t_24;
 
                                         /* "convolve.pyx":201
- *                         for row in xrange(b.shape[1]):
- *                             for col in xrange(b.shape[2]):
- *                                 a_x = l+row-padding_x             # <<<<<<<<<<<<<<
- *                                 a_y = m+col-padding_y
- *                                 if a_x<0 or a_x>a.shape[1]-1 or a_y<0 or a_y>a.shape[2]-1:
+ *                         for row in xrange(weight.shape[2]):
+ *                             for col in xrange(weight.shape[3]):
+ *                                 a_x = x+row-padding_x             # <<<<<<<<<<<<<<
+ *                                 a_y = y+col-padding_y
+ *                                 if a_x<0 or a_x>derr.shape[1]-1 or a_y<0 or a_y>derr.shape[2]-1:
  */
-                                        __pyx_v_a_x = ((__pyx_v_l + __pyx_v_row) - __pyx_v_padding_x);
+                                        __pyx_v_a_x = ((__pyx_v_x + __pyx_v_row) - __pyx_v_padding_x);
 
                                         /* "convolve.pyx":202
- *                             for col in xrange(b.shape[2]):
- *                                 a_x = l+row-padding_x
- *                                 a_y = m+col-padding_y             # <<<<<<<<<<<<<<
- *                                 if a_x<0 or a_x>a.shape[1]-1 or a_y<0 or a_y>a.shape[2]-1:
+ *                             for col in xrange(weight.shape[3]):
+ *                                 a_x = x+row-padding_x
+ *                                 a_y = y+col-padding_y             # <<<<<<<<<<<<<<
+ *                                 if a_x<0 or a_x>derr.shape[1]-1 or a_y<0 or a_y>derr.shape[2]-1:
  *                                     continue
  */
-                                        __pyx_v_a_y = ((__pyx_v_m + __pyx_v_col) - __pyx_v_padding_y);
+                                        __pyx_v_a_y = ((__pyx_v_y + __pyx_v_col) - __pyx_v_padding_y);
 
                                         /* "convolve.pyx":203
- *                                 a_x = l+row-padding_x
- *                                 a_y = m+col-padding_y
- *                                 if a_x<0 or a_x>a.shape[1]-1 or a_y<0 or a_y>a.shape[2]-1:             # <<<<<<<<<<<<<<
+ *                                 a_x = x+row-padding_x
+ *                                 a_y = y+col-padding_y
+ *                                 if a_x<0 or a_x>derr.shape[1]-1 or a_y<0 or a_y>derr.shape[2]-1:             # <<<<<<<<<<<<<<
  *                                     continue
- *                                 ret[i,j,l,m] += a[k,a_x,a_y,j] * b[k+1,row,col,i]
+ *                                 new_derr[derr.shape[0]-2-k,x,y,j] += derr[derr.shape[0]-1-k,a_x,a_y,i]*weight[i,j,weight.shape[2]-1-row,weight.shape[3]-1-col]
  */
-                                        __pyx_t_25 = ((__pyx_v_a_x < 0) != 0);
-                                        if (!__pyx_t_25) {
+                                        __pyx_t_26 = ((__pyx_v_a_x < 0) != 0);
+                                        if (!__pyx_t_26) {
                                           goto __pyx_L24_next_or;
                                         } else {
-                                          __pyx_t_24 = __pyx_t_25;
+                                          __pyx_t_25 = __pyx_t_26;
                                           goto __pyx_L23_bool_binop_done;
                                         }
                                         __pyx_L24_next_or:;
-                                        __pyx_t_25 = ((__pyx_v_a_x > ((__pyx_v_a->dimensions[1]) - 1)) != 0);
-                                        if (!__pyx_t_25) {
+                                        __pyx_t_26 = ((__pyx_v_a_x > ((__pyx_v_derr->dimensions[1]) - 1)) != 0);
+                                        if (!__pyx_t_26) {
                                           goto __pyx_L25_next_or;
                                         } else {
-                                          __pyx_t_24 = __pyx_t_25;
+                                          __pyx_t_25 = __pyx_t_26;
                                           goto __pyx_L23_bool_binop_done;
                                         }
                                         __pyx_L25_next_or:;
-                                        __pyx_t_25 = ((__pyx_v_a_y < 0) != 0);
-                                        if (!__pyx_t_25) {
+                                        __pyx_t_26 = ((__pyx_v_a_y < 0) != 0);
+                                        if (!__pyx_t_26) {
                                           goto __pyx_L26_next_or;
                                         } else {
-                                          __pyx_t_24 = __pyx_t_25;
+                                          __pyx_t_25 = __pyx_t_26;
                                           goto __pyx_L23_bool_binop_done;
                                         }
                                         __pyx_L26_next_or:;
-                                        __pyx_t_25 = ((__pyx_v_a_y > ((__pyx_v_a->dimensions[2]) - 1)) != 0);
-                                        __pyx_t_24 = __pyx_t_25;
+                                        __pyx_t_26 = ((__pyx_v_a_y > ((__pyx_v_derr->dimensions[2]) - 1)) != 0);
+                                        __pyx_t_25 = __pyx_t_26;
                                         __pyx_L23_bool_binop_done:;
-                                        if (__pyx_t_24) {
+                                        if (__pyx_t_25) {
 
                                           /* "convolve.pyx":204
- *                                 a_y = m+col-padding_y
- *                                 if a_x<0 or a_x>a.shape[1]-1 or a_y<0 or a_y>a.shape[2]-1:
+ *                                 a_y = y+col-padding_y
+ *                                 if a_x<0 or a_x>derr.shape[1]-1 or a_y<0 or a_y>derr.shape[2]-1:
  *                                     continue             # <<<<<<<<<<<<<<
- *                                 ret[i,j,l,m] += a[k,a_x,a_y,j] * b[k+1,row,col,i]
- *     return ret
+ *                                 new_derr[derr.shape[0]-2-k,x,y,j] += derr[derr.shape[0]-1-k,a_x,a_y,i]*weight[i,j,weight.shape[2]-1-row,weight.shape[3]-1-col]
+ * 
  */
                                           goto __pyx_L20_continue;
                                         }
 
                                         /* "convolve.pyx":205
- *                                 if a_x<0 or a_x>a.shape[1]-1 or a_y<0 or a_y>a.shape[2]-1:
+ *                                 if a_x<0 or a_x>derr.shape[1]-1 or a_y<0 or a_y>derr.shape[2]-1:
  *                                     continue
- *                                 ret[i,j,l,m] += a[k,a_x,a_y,j] * b[k+1,row,col,i]             # <<<<<<<<<<<<<<
- *     return ret
+ *                                 new_derr[derr.shape[0]-2-k,x,y,j] += derr[derr.shape[0]-1-k,a_x,a_y,i]*weight[i,j,weight.shape[2]-1-row,weight.shape[3]-1-col]             # <<<<<<<<<<<<<<
+ * 
+ *                         new_derr[derr.shape[0]-2-k,x,y,j] *= node[derr.shape[0]-2-k,x,y,j]*(1-node[derr.shape[0]-2-k,x,y,j])
+ */
+                                        __pyx_t_27 = (((__pyx_v_derr->dimensions[0]) - 1) - __pyx_v_k);
+                                        __pyx_t_28 = __pyx_v_a_x;
+                                        __pyx_t_29 = __pyx_v_a_y;
+                                        __pyx_t_30 = __pyx_v_i;
+                                        if (__pyx_t_27 < 0) __pyx_t_27 += __pyx_pybuffernd_derr.diminfo[0].shape;
+                                        if (__pyx_t_28 < 0) __pyx_t_28 += __pyx_pybuffernd_derr.diminfo[1].shape;
+                                        if (__pyx_t_29 < 0) __pyx_t_29 += __pyx_pybuffernd_derr.diminfo[2].shape;
+                                        __pyx_t_31 = __pyx_v_i;
+                                        __pyx_t_32 = __pyx_v_j;
+                                        __pyx_t_33 = (((__pyx_v_weight->dimensions[2]) - 1) - __pyx_v_row);
+                                        __pyx_t_34 = (((__pyx_v_weight->dimensions[3]) - 1) - __pyx_v_col);
+                                        if (__pyx_t_33 < 0) __pyx_t_33 += __pyx_pybuffernd_weight.diminfo[2].shape;
+                                        if (__pyx_t_34 < 0) __pyx_t_34 += __pyx_pybuffernd_weight.diminfo[3].shape;
+                                        __pyx_t_35 = (((__pyx_v_derr->dimensions[0]) - 2) - __pyx_v_k);
+                                        __pyx_t_36 = __pyx_v_x;
+                                        __pyx_t_37 = __pyx_v_y;
+                                        __pyx_t_38 = __pyx_v_j;
+                                        if (__pyx_t_35 < 0) __pyx_t_35 += __pyx_pybuffernd_new_derr.diminfo[0].shape;
+                                        *__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_new_derr.rcbuffer->pybuffer.buf, __pyx_t_35, __pyx_pybuffernd_new_derr.diminfo[0].strides, __pyx_t_36, __pyx_pybuffernd_new_derr.diminfo[1].strides, __pyx_t_37, __pyx_pybuffernd_new_derr.diminfo[2].strides, __pyx_t_38, __pyx_pybuffernd_new_derr.diminfo[3].strides) += ((*__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_derr.rcbuffer->pybuffer.buf, __pyx_t_27, __pyx_pybuffernd_derr.diminfo[0].strides, __pyx_t_28, __pyx_pybuffernd_derr.diminfo[1].strides, __pyx_t_29, __pyx_pybuffernd_derr.diminfo[2].strides, __pyx_t_30, __pyx_pybuffernd_derr.diminfo[3].strides)) * (*__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_weight.rcbuffer->pybuffer.buf, __pyx_t_31, __pyx_pybuffernd_weight.diminfo[0].strides, __pyx_t_32, __pyx_pybuffernd_weight.diminfo[1].strides, __pyx_t_33, __pyx_pybuffernd_weight.diminfo[2].strides, __pyx_t_34, __pyx_pybuffernd_weight.diminfo[3].strides)));
+                                        __pyx_L20_continue:;
+                                      }
+                                    }
+
+                                    /* "convolve.pyx":207
+ *                                 new_derr[derr.shape[0]-2-k,x,y,j] += derr[derr.shape[0]-1-k,a_x,a_y,i]*weight[i,j,weight.shape[2]-1-row,weight.shape[3]-1-col]
+ * 
+ *                         new_derr[derr.shape[0]-2-k,x,y,j] *= node[derr.shape[0]-2-k,x,y,j]*(1-node[derr.shape[0]-2-k,x,y,j])             # <<<<<<<<<<<<<<
+ * 
+ *     derr = derr + new_derr
+ */
+                                    __pyx_t_39 = (((__pyx_v_derr->dimensions[0]) - 2) - __pyx_v_k);
+                                    __pyx_t_22 = __pyx_v_x;
+                                    __pyx_t_24 = __pyx_v_y;
+                                    __pyx_t_40 = __pyx_v_j;
+                                    if (__pyx_t_39 < 0) __pyx_t_39 += __pyx_pybuffernd_node.diminfo[0].shape;
+                                    __pyx_t_41 = (((__pyx_v_derr->dimensions[0]) - 2) - __pyx_v_k);
+                                    __pyx_t_42 = __pyx_v_x;
+                                    __pyx_t_43 = __pyx_v_y;
+                                    __pyx_t_44 = __pyx_v_j;
+                                    if (__pyx_t_41 < 0) __pyx_t_41 += __pyx_pybuffernd_node.diminfo[0].shape;
+                                    __pyx_t_45 = (((__pyx_v_derr->dimensions[0]) - 2) - __pyx_v_k);
+                                    __pyx_t_46 = __pyx_v_x;
+                                    __pyx_t_47 = __pyx_v_y;
+                                    __pyx_t_48 = __pyx_v_j;
+                                    if (__pyx_t_45 < 0) __pyx_t_45 += __pyx_pybuffernd_new_derr.diminfo[0].shape;
+                                    *__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_new_derr.rcbuffer->pybuffer.buf, __pyx_t_45, __pyx_pybuffernd_new_derr.diminfo[0].strides, __pyx_t_46, __pyx_pybuffernd_new_derr.diminfo[1].strides, __pyx_t_47, __pyx_pybuffernd_new_derr.diminfo[2].strides, __pyx_t_48, __pyx_pybuffernd_new_derr.diminfo[3].strides) *= ((*__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_node.rcbuffer->pybuffer.buf, __pyx_t_39, __pyx_pybuffernd_node.diminfo[0].strides, __pyx_t_22, __pyx_pybuffernd_node.diminfo[1].strides, __pyx_t_24, __pyx_pybuffernd_node.diminfo[2].strides, __pyx_t_40, __pyx_pybuffernd_node.diminfo[3].strides)) * (1.0 - (*__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_node.rcbuffer->pybuffer.buf, __pyx_t_41, __pyx_pybuffernd_node.diminfo[0].strides, __pyx_t_42, __pyx_pybuffernd_node.diminfo[1].strides, __pyx_t_43, __pyx_pybuffernd_node.diminfo[2].strides, __pyx_t_44, __pyx_pybuffernd_node.diminfo[3].strides))));
+                                  }
+                                }
+                              }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #if ((defined(__APPLE__) || defined(__OSX__)) && (defined(__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && (__GNUC_MINOR__ > 95)))))
+            #undef likely
+            #undef unlikely
+            #define likely(x)   __builtin_expect(!!(x), 1)
+            #define unlikely(x) __builtin_expect(!!(x), 0)
+        #endif
+      }
+
+      /* "convolve.pyx":194
+ * 
+ *     cdef int a_x, a_y
+ *     for i in prange(derr.shape[3],nogil=True):             # <<<<<<<<<<<<<<
+ *         for j in xrange(derr.shape[3]):
+ *             for k in xrange(derr.shape[0] - 1):
+ */
+      /*finally:*/ {
+        /*normal exit:*/{
+          #ifdef WITH_THREAD
+          Py_BLOCK_THREADS
+          #endif
+          goto __pyx_L5;
+        }
+        __pyx_L5:;
+      }
+  }
+
+  /* "convolve.pyx":209
+ *                         new_derr[derr.shape[0]-2-k,x,y,j] *= node[derr.shape[0]-2-k,x,y,j]*(1-node[derr.shape[0]-2-k,x,y,j])
+ * 
+ *     derr = derr + new_derr             # <<<<<<<<<<<<<<
+ * 
+ *     for i in prange(node.shape[3], nogil=True):
+ */
+  __pyx_t_1 = PyNumber_Add(((PyObject *)__pyx_v_derr), ((PyObject *)__pyx_v_new_derr)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_49 = ((PyArrayObject *)__pyx_t_1);
+  {
+    __Pyx_BufFmt_StackElem __pyx_stack[1];
+    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_derr.rcbuffer->pybuffer);
+    __pyx_t_50 = __Pyx_GetBufferAndValidate(&__pyx_pybuffernd_derr.rcbuffer->pybuffer, (PyObject*)__pyx_t_49, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack);
+    if (unlikely(__pyx_t_50 < 0)) {
+      PyErr_Fetch(&__pyx_t_51, &__pyx_t_52, &__pyx_t_53);
+      if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_derr.rcbuffer->pybuffer, (PyObject*)__pyx_v_derr, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {
+        Py_XDECREF(__pyx_t_51); Py_XDECREF(__pyx_t_52); Py_XDECREF(__pyx_t_53);
+        __Pyx_RaiseBufferFallbackError();
+      } else {
+        PyErr_Restore(__pyx_t_51, __pyx_t_52, __pyx_t_53);
+      }
+    }
+    __pyx_pybuffernd_derr.diminfo[0].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_derr.diminfo[0].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_derr.diminfo[1].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_derr.diminfo[1].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_derr.diminfo[2].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_derr.diminfo[2].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_derr.diminfo[3].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_derr.diminfo[3].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[3];
+    if (unlikely(__pyx_t_50 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_t_49 = 0;
+  __Pyx_DECREF_SET(__pyx_v_derr, ((PyArrayObject *)__pyx_t_1));
+  __pyx_t_1 = 0;
+
+  /* "convolve.pyx":211
+ *     derr = derr + new_derr
+ * 
+ *     for i in prange(node.shape[3], nogil=True):             # <<<<<<<<<<<<<<
+ *         for j in xrange(node.shape[3]):
+ *             for k in xrange(node.shape[0] - 1):
+ */
+  {
+      #ifdef WITH_THREAD
+      PyThreadState *_save;
+      Py_UNBLOCK_THREADS
+      #endif
+      /*try:*/ {
+        __pyx_t_10 = (__pyx_v_node->dimensions[3]);
+        if (1 == 0) abort();
+        {
+            #if ((defined(__APPLE__) || defined(__OSX__)) && (defined(__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && (__GNUC_MINOR__ > 95)))))
+                #undef likely
+                #undef unlikely
+                #define likely(x)   (x)
+                #define unlikely(x) (x)
+            #endif
+            __pyx_t_11 = (__pyx_t_10 - 0) / 1;
+            if (__pyx_t_11 > 0)
+            {
+                #ifdef _OPENMP
+                #pragma omp parallel private(__pyx_t_65, __pyx_t_56, __pyx_t_14, __pyx_t_64, __pyx_t_63, __pyx_t_19, __pyx_t_58, __pyx_t_20, __pyx_t_54, __pyx_t_50, __pyx_t_13, __pyx_t_26, __pyx_t_66, __pyx_t_68, __pyx_t_17, __pyx_t_16, __pyx_t_67, __pyx_t_61, __pyx_t_15, __pyx_t_55, __pyx_t_57, __pyx_t_60, __pyx_t_62, __pyx_t_59, __pyx_t_25, __pyx_t_18)
+                #endif /* _OPENMP */
+                {
+                    #ifdef _OPENMP
+                    #pragma omp for lastprivate(__pyx_v_k) lastprivate(__pyx_v_col) lastprivate(__pyx_v_m) lastprivate(__pyx_v_a_x) lastprivate(__pyx_v_j) lastprivate(__pyx_v_row) firstprivate(__pyx_v_i) lastprivate(__pyx_v_i) lastprivate(__pyx_v_a_y) lastprivate(__pyx_v_l)
+                    #endif /* _OPENMP */
+                    for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12++){
+                        {
+                            __pyx_v_i = 0 + 1 * __pyx_t_12;
+                            /* Initialize private variables to invalid values */
+                            __pyx_v_k = ((unsigned int)0xbad0bad0);
+                            __pyx_v_col = ((unsigned int)0xbad0bad0);
+                            __pyx_v_m = ((unsigned int)0xbad0bad0);
+                            __pyx_v_a_x = ((int)0xbad0bad0);
+                            __pyx_v_j = ((unsigned int)0xbad0bad0);
+                            __pyx_v_row = ((unsigned int)0xbad0bad0);
+                            __pyx_v_a_y = ((int)0xbad0bad0);
+                            __pyx_v_l = ((unsigned int)0xbad0bad0);
+
+                            /* "convolve.pyx":212
+ * 
+ *     for i in prange(node.shape[3], nogil=True):
+ *         for j in xrange(node.shape[3]):             # <<<<<<<<<<<<<<
+ *             for k in xrange(node.shape[0] - 1):
+ *                 for l in xrange(out_x):
+ */
+                            __pyx_t_13 = (__pyx_v_node->dimensions[3]);
+                            for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
+                              __pyx_v_j = __pyx_t_14;
+
+                              /* "convolve.pyx":213
+ *     for i in prange(node.shape[3], nogil=True):
+ *         for j in xrange(node.shape[3]):
+ *             for k in xrange(node.shape[0] - 1):             # <<<<<<<<<<<<<<
+ *                 for l in xrange(out_x):
+ *                     for m in xrange(out_y):
+ */
+                              __pyx_t_15 = ((__pyx_v_node->dimensions[0]) - 1);
+                              for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
+                                __pyx_v_k = __pyx_t_16;
+
+                                /* "convolve.pyx":214
+ *         for j in xrange(node.shape[3]):
+ *             for k in xrange(node.shape[0] - 1):
+ *                 for l in xrange(out_x):             # <<<<<<<<<<<<<<
+ *                     for m in xrange(out_y):
+ *                         for row in xrange(derr.shape[1]):
+ */
+                                __pyx_t_18 = __pyx_v_out_x;
+                                for (__pyx_t_20 = 0; __pyx_t_20 < __pyx_t_18; __pyx_t_20+=1) {
+                                  __pyx_v_l = __pyx_t_20;
+
+                                  /* "convolve.pyx":215
+ *             for k in xrange(node.shape[0] - 1):
+ *                 for l in xrange(out_x):
+ *                     for m in xrange(out_y):             # <<<<<<<<<<<<<<
+ *                         for row in xrange(derr.shape[1]):
+ *                             for col in xrange(derr.shape[2]):
+ */
+                                  __pyx_t_54 = __pyx_v_out_y;
+                                  for (__pyx_t_55 = 0; __pyx_t_55 < __pyx_t_54; __pyx_t_55+=1) {
+                                    __pyx_v_m = __pyx_t_55;
+
+                                    /* "convolve.pyx":216
+ *                 for l in xrange(out_x):
+ *                     for m in xrange(out_y):
+ *                         for row in xrange(derr.shape[1]):             # <<<<<<<<<<<<<<
+ *                             for col in xrange(derr.shape[2]):
+ *                                 a_x = l+row-padding_x
+ */
+                                    __pyx_t_17 = (__pyx_v_derr->dimensions[1]);
+                                    for (__pyx_t_56 = 0; __pyx_t_56 < __pyx_t_17; __pyx_t_56+=1) {
+                                      __pyx_v_row = __pyx_t_56;
+
+                                      /* "convolve.pyx":217
+ *                     for m in xrange(out_y):
+ *                         for row in xrange(derr.shape[1]):
+ *                             for col in xrange(derr.shape[2]):             # <<<<<<<<<<<<<<
+ *                                 a_x = l+row-padding_x
+ *                                 a_y = m+col-padding_y
+ */
+                                      __pyx_t_19 = (__pyx_v_derr->dimensions[2]);
+                                      for (__pyx_t_57 = 0; __pyx_t_57 < __pyx_t_19; __pyx_t_57+=1) {
+                                        __pyx_v_col = __pyx_t_57;
+
+                                        /* "convolve.pyx":218
+ *                         for row in xrange(derr.shape[1]):
+ *                             for col in xrange(derr.shape[2]):
+ *                                 a_x = l+row-padding_x             # <<<<<<<<<<<<<<
+ *                                 a_y = m+col-padding_y
+ *                                 if a_x<0 or a_x>node.shape[1]-1 or a_y<0 or a_y>node.shape[2]-1:
+ */
+                                        __pyx_v_a_x = ((__pyx_v_l + __pyx_v_row) - __pyx_v_padding_x);
+
+                                        /* "convolve.pyx":219
+ *                             for col in xrange(derr.shape[2]):
+ *                                 a_x = l+row-padding_x
+ *                                 a_y = m+col-padding_y             # <<<<<<<<<<<<<<
+ *                                 if a_x<0 or a_x>node.shape[1]-1 or a_y<0 or a_y>node.shape[2]-1:
+ *                                     continue
+ */
+                                        __pyx_v_a_y = ((__pyx_v_m + __pyx_v_col) - __pyx_v_padding_y);
+
+                                        /* "convolve.pyx":220
+ *                                 a_x = l+row-padding_x
+ *                                 a_y = m+col-padding_y
+ *                                 if a_x<0 or a_x>node.shape[1]-1 or a_y<0 or a_y>node.shape[2]-1:             # <<<<<<<<<<<<<<
+ *                                     continue
+ *                                 ret[i,j,l,m] += node[k,a_x,a_y,j] * derr[k+1,row,col,i]
+ */
+                                        __pyx_t_26 = ((__pyx_v_a_x < 0) != 0);
+                                        if (!__pyx_t_26) {
+                                          goto __pyx_L50_next_or;
+                                        } else {
+                                          __pyx_t_25 = __pyx_t_26;
+                                          goto __pyx_L49_bool_binop_done;
+                                        }
+                                        __pyx_L50_next_or:;
+                                        __pyx_t_26 = ((__pyx_v_a_x > ((__pyx_v_node->dimensions[1]) - 1)) != 0);
+                                        if (!__pyx_t_26) {
+                                          goto __pyx_L51_next_or;
+                                        } else {
+                                          __pyx_t_25 = __pyx_t_26;
+                                          goto __pyx_L49_bool_binop_done;
+                                        }
+                                        __pyx_L51_next_or:;
+                                        __pyx_t_26 = ((__pyx_v_a_y < 0) != 0);
+                                        if (!__pyx_t_26) {
+                                          goto __pyx_L52_next_or;
+                                        } else {
+                                          __pyx_t_25 = __pyx_t_26;
+                                          goto __pyx_L49_bool_binop_done;
+                                        }
+                                        __pyx_L52_next_or:;
+                                        __pyx_t_26 = ((__pyx_v_a_y > ((__pyx_v_node->dimensions[2]) - 1)) != 0);
+                                        __pyx_t_25 = __pyx_t_26;
+                                        __pyx_L49_bool_binop_done:;
+                                        if (__pyx_t_25) {
+
+                                          /* "convolve.pyx":221
+ *                                 a_y = m+col-padding_y
+ *                                 if a_x<0 or a_x>node.shape[1]-1 or a_y<0 or a_y>node.shape[2]-1:
+ *                                     continue             # <<<<<<<<<<<<<<
+ *                                 ret[i,j,l,m] += node[k,a_x,a_y,j] * derr[k+1,row,col,i]
+ *     return ret, derr
+ */
+                                          goto __pyx_L46_continue;
+                                        }
+
+                                        /* "convolve.pyx":222
+ *                                 if a_x<0 or a_x>node.shape[1]-1 or a_y<0 or a_y>node.shape[2]-1:
+ *                                     continue
+ *                                 ret[i,j,l,m] += node[k,a_x,a_y,j] * derr[k+1,row,col,i]             # <<<<<<<<<<<<<<
+ *     return ret, derr
  * 
  */
-                                        __pyx_t_26 = __pyx_v_k;
-                                        __pyx_t_27 = __pyx_v_a_x;
-                                        __pyx_t_28 = __pyx_v_a_y;
-                                        __pyx_t_29 = __pyx_v_j;
-                                        if (__pyx_t_27 < 0) __pyx_t_27 += __pyx_pybuffernd_a.diminfo[1].shape;
-                                        if (__pyx_t_28 < 0) __pyx_t_28 += __pyx_pybuffernd_a.diminfo[2].shape;
-                                        __pyx_t_30 = (__pyx_v_k + 1);
-                                        __pyx_t_31 = __pyx_v_row;
-                                        __pyx_t_32 = __pyx_v_col;
-                                        __pyx_t_33 = __pyx_v_i;
-                                        if (__pyx_t_30 < 0) __pyx_t_30 += __pyx_pybuffernd_b.diminfo[0].shape;
-                                        __pyx_t_34 = __pyx_v_i;
-                                        __pyx_t_35 = __pyx_v_j;
-                                        __pyx_t_36 = __pyx_v_l;
-                                        __pyx_t_37 = __pyx_v_m;
-                                        *__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_ret.rcbuffer->pybuffer.buf, __pyx_t_34, __pyx_pybuffernd_ret.diminfo[0].strides, __pyx_t_35, __pyx_pybuffernd_ret.diminfo[1].strides, __pyx_t_36, __pyx_pybuffernd_ret.diminfo[2].strides, __pyx_t_37, __pyx_pybuffernd_ret.diminfo[3].strides) += ((*__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_a.rcbuffer->pybuffer.buf, __pyx_t_26, __pyx_pybuffernd_a.diminfo[0].strides, __pyx_t_27, __pyx_pybuffernd_a.diminfo[1].strides, __pyx_t_28, __pyx_pybuffernd_a.diminfo[2].strides, __pyx_t_29, __pyx_pybuffernd_a.diminfo[3].strides)) * (*__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_b.rcbuffer->pybuffer.buf, __pyx_t_30, __pyx_pybuffernd_b.diminfo[0].strides, __pyx_t_31, __pyx_pybuffernd_b.diminfo[1].strides, __pyx_t_32, __pyx_pybuffernd_b.diminfo[2].strides, __pyx_t_33, __pyx_pybuffernd_b.diminfo[3].strides)));
-                                        __pyx_L20_continue:;
+                                        __pyx_t_58 = __pyx_v_k;
+                                        __pyx_t_50 = __pyx_v_a_x;
+                                        __pyx_t_59 = __pyx_v_a_y;
+                                        __pyx_t_60 = __pyx_v_j;
+                                        if (__pyx_t_50 < 0) __pyx_t_50 += __pyx_pybuffernd_node.diminfo[1].shape;
+                                        if (__pyx_t_59 < 0) __pyx_t_59 += __pyx_pybuffernd_node.diminfo[2].shape;
+                                        __pyx_t_61 = (__pyx_v_k + 1);
+                                        __pyx_t_62 = __pyx_v_row;
+                                        __pyx_t_63 = __pyx_v_col;
+                                        __pyx_t_64 = __pyx_v_i;
+                                        if (__pyx_t_61 < 0) __pyx_t_61 += __pyx_pybuffernd_derr.diminfo[0].shape;
+                                        __pyx_t_65 = __pyx_v_i;
+                                        __pyx_t_66 = __pyx_v_j;
+                                        __pyx_t_67 = __pyx_v_l;
+                                        __pyx_t_68 = __pyx_v_m;
+                                        *__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_ret.rcbuffer->pybuffer.buf, __pyx_t_65, __pyx_pybuffernd_ret.diminfo[0].strides, __pyx_t_66, __pyx_pybuffernd_ret.diminfo[1].strides, __pyx_t_67, __pyx_pybuffernd_ret.diminfo[2].strides, __pyx_t_68, __pyx_pybuffernd_ret.diminfo[3].strides) += ((*__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_node.rcbuffer->pybuffer.buf, __pyx_t_58, __pyx_pybuffernd_node.diminfo[0].strides, __pyx_t_50, __pyx_pybuffernd_node.diminfo[1].strides, __pyx_t_59, __pyx_pybuffernd_node.diminfo[2].strides, __pyx_t_60, __pyx_pybuffernd_node.diminfo[3].strides)) * (*__Pyx_BufPtrStrided4d(__pyx_t_8convolve_DTYPE_t *, __pyx_pybuffernd_derr.rcbuffer->pybuffer.buf, __pyx_t_61, __pyx_pybuffernd_derr.diminfo[0].strides, __pyx_t_62, __pyx_pybuffernd_derr.diminfo[1].strides, __pyx_t_63, __pyx_pybuffernd_derr.diminfo[2].strides, __pyx_t_64, __pyx_pybuffernd_derr.diminfo[3].strides)));
+                                        __pyx_L46_continue:;
                                       }
                                     }
                                   }
@@ -5361,42 +5795,50 @@ static PyObject *__pyx_pf_8convolve_10convolve_recurrent_backward(CYTHON_UNUSED 
         #endif
       }
 
-      /* "convolve.pyx":194
- *     cdef int a_x, a_y
+      /* "convolve.pyx":211
+ *     derr = derr + new_derr
  * 
- *     for i in prange(a.shape[3], nogil=True):             # <<<<<<<<<<<<<<
- *         for j in xrange(a.shape[3]):
- *             for k in xrange(a.shape[0] - 1):
+ *     for i in prange(node.shape[3], nogil=True):             # <<<<<<<<<<<<<<
+ *         for j in xrange(node.shape[3]):
+ *             for k in xrange(node.shape[0] - 1):
  */
       /*finally:*/ {
         /*normal exit:*/{
           #ifdef WITH_THREAD
           Py_BLOCK_THREADS
           #endif
-          goto __pyx_L5;
+          goto __pyx_L31;
         }
-        __pyx_L5:;
+        __pyx_L31:;
       }
   }
 
-  /* "convolve.pyx":206
+  /* "convolve.pyx":223
  *                                     continue
- *                                 ret[i,j,l,m] += a[k,a_x,a_y,j] * b[k+1,row,col,i]
- *     return ret             # <<<<<<<<<<<<<<
+ *                                 ret[i,j,l,m] += node[k,a_x,a_y,j] * derr[k+1,row,col,i]
+ *     return ret, derr             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(((PyObject *)__pyx_v_ret));
-  __pyx_r = ((PyObject *)__pyx_v_ret);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, ((PyObject *)__pyx_v_ret));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_ret));
+  __Pyx_INCREF(((PyObject *)__pyx_v_derr));
+  PyTuple_SET_ITEM(__pyx_t_1, 1, ((PyObject *)__pyx_v_derr));
+  __Pyx_GIVEREF(((PyObject *)__pyx_v_derr));
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
 
   /* "convolve.pyx":186
  * 
  * @cython.boundscheck(False)
- * def convolve_recurrent_backward(np.ndarray[DTYPE_t, ndim = 4] a, np.ndarray[DTYPE_t, ndim = 4] b, unsigned int padding_x, unsigned int padding_y):             # <<<<<<<<<<<<<<
+ * def convolve_recurrent_backward(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 4] derr, np.ndarray[DTYPE_t,ndim=4] weight, unsigned int padding_x, unsigned int padding_y):             # <<<<<<<<<<<<<<
  * 
- *     cdef unsigned int i,j,k,l,m,row,col
+ *     cdef unsigned int i,j,k,l,m,row,col,x,y
  */
 
   /* function exit code */
@@ -5410,25 +5852,31 @@ static PyObject *__pyx_pf_8convolve_10convolve_recurrent_backward(CYTHON_UNUSED 
   __Pyx_XDECREF(__pyx_t_7);
   { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
     __Pyx_ErrFetch(&__pyx_type, &__pyx_value, &__pyx_tb);
-    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_a.rcbuffer->pybuffer);
-    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_b.rcbuffer->pybuffer);
+    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_derr.rcbuffer->pybuffer);
+    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_new_derr.rcbuffer->pybuffer);
+    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_node.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_ret.rcbuffer->pybuffer);
+    __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_weight.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
   __Pyx_AddTraceback("convolve.convolve_recurrent_backward", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
-  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_a.rcbuffer->pybuffer);
-  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_b.rcbuffer->pybuffer);
+  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_derr.rcbuffer->pybuffer);
+  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_new_derr.rcbuffer->pybuffer);
+  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_node.rcbuffer->pybuffer);
   __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_ret.rcbuffer->pybuffer);
+  __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_weight.rcbuffer->pybuffer);
   __pyx_L2:;
   __Pyx_XDECREF((PyObject *)__pyx_v_ret);
+  __Pyx_XDECREF((PyObject *)__pyx_v_new_derr);
+  __Pyx_XDECREF((PyObject *)__pyx_v_derr);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "convolve.pyx":210
+/* "convolve.pyx":227
  * 
  * @cython.boundscheck(False)
  * def convolve4d_forward(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
@@ -5480,7 +5928,7 @@ static PyObject *__pyx_pw_8convolve_13convolve4d_forward(PyObject *__pyx_self, P
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_weight)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("convolve4d_forward", 0, 2, 8, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("convolve4d_forward", 0, 2, 8, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (kw_args > 0) {
@@ -5514,7 +5962,7 @@ static PyObject *__pyx_pw_8convolve_13convolve4d_forward(PyObject *__pyx_self, P
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "convolve4d_forward") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "convolve4d_forward") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -5533,46 +5981,46 @@ static PyObject *__pyx_pw_8convolve_13convolve4d_forward(PyObject *__pyx_self, P
     __pyx_v_node = ((PyArrayObject *)values[0]);
     __pyx_v_weight = ((PyArrayObject *)values[1]);
     if (values[2]) {
-      __pyx_v_mode = __Pyx_PyObject_AsString(values[2]); if (unlikely((!__pyx_v_mode) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_mode = __Pyx_PyObject_AsString(values[2]); if (unlikely((!__pyx_v_mode) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_mode = ((char *)__pyx_k_valid);
     }
     if (values[3]) {
-      __pyx_v_padding_x = __Pyx_PyInt_As_unsigned_int(values[3]); if (unlikely((__pyx_v_padding_x == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_x = __Pyx_PyInt_As_unsigned_int(values[3]); if (unlikely((__pyx_v_padding_x == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_x = ((unsigned int)0);
     }
     if (values[4]) {
-      __pyx_v_padding_y = __Pyx_PyInt_As_unsigned_int(values[4]); if (unlikely((__pyx_v_padding_y == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_y = __Pyx_PyInt_As_unsigned_int(values[4]); if (unlikely((__pyx_v_padding_y == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_y = ((unsigned int)0);
     }
     if (values[5]) {
-      __pyx_v_padding_z = __Pyx_PyInt_As_unsigned_int(values[5]); if (unlikely((__pyx_v_padding_z == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_z = __Pyx_PyInt_As_unsigned_int(values[5]); if (unlikely((__pyx_v_padding_z == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_z = ((unsigned int)0);
     }
     if (values[6]) {
-      __pyx_v_padding_flug = __Pyx_PyInt_As_unsigned_int(values[6]); if (unlikely((__pyx_v_padding_flug == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_flug = __Pyx_PyInt_As_unsigned_int(values[6]); if (unlikely((__pyx_v_padding_flug == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_flug = ((unsigned int)0);
     }
     if (values[7]) {
-      __pyx_v_rotation = __Pyx_PyInt_As_unsigned_int(values[7]); if (unlikely((__pyx_v_rotation == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_rotation = __Pyx_PyInt_As_unsigned_int(values[7]); if (unlikely((__pyx_v_rotation == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_rotation = ((unsigned int)0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("convolve4d_forward", 0, 2, 8, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("convolve4d_forward", 0, 2, 8, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("convolve.convolve4d_forward", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_node), __pyx_ptype_5numpy_ndarray, 1, "node", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_weight), __pyx_ptype_5numpy_ndarray, 1, "weight", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_node), __pyx_ptype_5numpy_ndarray, 1, "node", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_weight), __pyx_ptype_5numpy_ndarray, 1, "weight", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_8convolve_12convolve4d_forward(__pyx_self, __pyx_v_node, __pyx_v_weight, __pyx_v_mode, __pyx_v_padding_x, __pyx_v_padding_y, __pyx_v_padding_z, __pyx_v_padding_flug, __pyx_v_rotation);
 
   /* function exit code */
@@ -5665,16 +6113,16 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
   __pyx_pybuffernd_weight.rcbuffer = &__pyx_pybuffer_weight;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_node.rcbuffer->pybuffer, (PyObject*)__pyx_v_node, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_node.rcbuffer->pybuffer, (PyObject*)__pyx_v_node, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_node.diminfo[0].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_node.diminfo[0].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_node.diminfo[1].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_node.diminfo[1].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_node.diminfo[2].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_node.diminfo[2].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_node.diminfo[3].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_node.diminfo[3].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[3];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_weight.rcbuffer->pybuffer, (PyObject*)__pyx_v_weight, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 5, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_weight.rcbuffer->pybuffer, (PyObject*)__pyx_v_weight, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 5, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_weight.diminfo[0].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_weight.diminfo[0].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_weight.diminfo[1].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_weight.diminfo[1].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_weight.diminfo[2].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_weight.diminfo[2].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_weight.diminfo[3].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_weight.diminfo[3].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[3]; __pyx_pybuffernd_weight.diminfo[4].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[4]; __pyx_pybuffernd_weight.diminfo[4].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[4];
 
-  /* "convolve.pyx":211
+  /* "convolve.pyx":228
  * @cython.boundscheck(False)
  * def convolve4d_forward(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):
  *     if padding_flug ==0:             # <<<<<<<<<<<<<<
@@ -5684,7 +6132,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
   __pyx_t_1 = ((__pyx_v_padding_flug == 0) != 0);
   if (__pyx_t_1) {
 
-    /* "convolve.pyx":212
+    /* "convolve.pyx":229
  * def convolve4d_forward(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):
  *     if padding_flug ==0:
  *         if not strcmp(mode,'valid'):             # <<<<<<<<<<<<<<
@@ -5694,7 +6142,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
     __pyx_t_1 = ((!(strcmp(__pyx_v_mode, __pyx_k_valid) != 0)) != 0);
     if (__pyx_t_1) {
 
-      /* "convolve.pyx":213
+      /* "convolve.pyx":230
  *     if padding_flug ==0:
  *         if not strcmp(mode,'valid'):
  *             padding_x = 0             # <<<<<<<<<<<<<<
@@ -5703,7 +6151,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_x = 0;
 
-      /* "convolve.pyx":214
+      /* "convolve.pyx":231
  *         if not strcmp(mode,'valid'):
  *             padding_x = 0
  *             padding_y = 0             # <<<<<<<<<<<<<<
@@ -5712,7 +6160,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_y = 0;
 
-      /* "convolve.pyx":215
+      /* "convolve.pyx":232
  *             padding_x = 0
  *             padding_y = 0
  *             padding_z = 0             # <<<<<<<<<<<<<<
@@ -5723,7 +6171,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
       goto __pyx_L4;
     }
 
-    /* "convolve.pyx":216
+    /* "convolve.pyx":233
  *             padding_y = 0
  *             padding_z = 0
  *         elif not strcmp(mode,'same'):             # <<<<<<<<<<<<<<
@@ -5733,7 +6181,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
     __pyx_t_1 = ((!(strcmp(__pyx_v_mode, __pyx_k_same) != 0)) != 0);
     if (__pyx_t_1) {
 
-      /* "convolve.pyx":217
+      /* "convolve.pyx":234
  *             padding_z = 0
  *         elif not strcmp(mode,'same'):
  *             padding_x = (weight.shape[2] - 1) / 2             # <<<<<<<<<<<<<<
@@ -5742,7 +6190,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_x = __Pyx_div_long(((__pyx_v_weight->dimensions[2]) - 1), 2);
 
-      /* "convolve.pyx":218
+      /* "convolve.pyx":235
  *         elif not strcmp(mode,'same'):
  *             padding_x = (weight.shape[2] - 1) / 2
  *             padding_y = (weight.shape[3] - 1) / 2             # <<<<<<<<<<<<<<
@@ -5751,7 +6199,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_y = __Pyx_div_long(((__pyx_v_weight->dimensions[3]) - 1), 2);
 
-      /* "convolve.pyx":219
+      /* "convolve.pyx":236
  *             padding_x = (weight.shape[2] - 1) / 2
  *             padding_y = (weight.shape[3] - 1) / 2
  *             padding_z = (weight.shape[4] - 1) / 2             # <<<<<<<<<<<<<<
@@ -5762,7 +6210,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
       goto __pyx_L4;
     }
 
-    /* "convolve.pyx":220
+    /* "convolve.pyx":237
  *             padding_y = (weight.shape[3] - 1) / 2
  *             padding_z = (weight.shape[4] - 1) / 2
  *         elif not strcmp(mode,'full'):             # <<<<<<<<<<<<<<
@@ -5772,7 +6220,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
     __pyx_t_1 = ((!(strcmp(__pyx_v_mode, __pyx_k_full) != 0)) != 0);
     if (__pyx_t_1) {
 
-      /* "convolve.pyx":221
+      /* "convolve.pyx":238
  *             padding_z = (weight.shape[4] - 1) / 2
  *         elif not strcmp(mode,'full'):
  *             padding_x = weight.shape[2] - 1             # <<<<<<<<<<<<<<
@@ -5781,7 +6229,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_x = ((__pyx_v_weight->dimensions[2]) - 1);
 
-      /* "convolve.pyx":222
+      /* "convolve.pyx":239
  *         elif not strcmp(mode,'full'):
  *             padding_x = weight.shape[2] - 1
  *             padding_y = weight.shape[3] - 1             # <<<<<<<<<<<<<<
@@ -5790,7 +6238,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_y = ((__pyx_v_weight->dimensions[3]) - 1);
 
-      /* "convolve.pyx":223
+      /* "convolve.pyx":240
  *             padding_x = weight.shape[2] - 1
  *             padding_y = weight.shape[3] - 1
  *             padding_z = weight.shape[4] - 1             # <<<<<<<<<<<<<<
@@ -5802,25 +6250,25 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
     }
     /*else*/ {
 
-      /* "convolve.pyx":225
+      /* "convolve.pyx":242
  *             padding_z = weight.shape[4] - 1
  *         else:
  *             raise NameError('unsupported mode for convolve3d')             # <<<<<<<<<<<<<<
  * 
  *     cdef unsigned int out_x = node.shape[1] + 2*padding_x - weight.shape[2] + 1
  */
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_NameError, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_NameError, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 242; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_Raise(__pyx_t_2, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 242; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __pyx_L4:;
     goto __pyx_L3;
   }
   __pyx_L3:;
 
-  /* "convolve.pyx":227
+  /* "convolve.pyx":244
  *             raise NameError('unsupported mode for convolve3d')
  * 
  *     cdef unsigned int out_x = node.shape[1] + 2*padding_x - weight.shape[2] + 1             # <<<<<<<<<<<<<<
@@ -5829,7 +6277,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
   __pyx_v_out_x = ((((__pyx_v_node->dimensions[1]) + (2 * __pyx_v_padding_x)) - (__pyx_v_weight->dimensions[2])) + 1);
 
-  /* "convolve.pyx":228
+  /* "convolve.pyx":245
  * 
  *     cdef unsigned int out_x = node.shape[1] + 2*padding_x - weight.shape[2] + 1
  *     cdef unsigned int out_y = node.shape[2] + 2*padding_y - weight.shape[3] + 1             # <<<<<<<<<<<<<<
@@ -5838,7 +6286,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
   __pyx_v_out_y = ((((__pyx_v_node->dimensions[2]) + (2 * __pyx_v_padding_y)) - (__pyx_v_weight->dimensions[3])) + 1);
 
-  /* "convolve.pyx":229
+  /* "convolve.pyx":246
  *     cdef unsigned int out_x = node.shape[1] + 2*padding_x - weight.shape[2] + 1
  *     cdef unsigned int out_y = node.shape[2] + 2*padding_y - weight.shape[3] + 1
  *     cdef unsigned int out_z = node.shape[0] + 2*padding_z - weight.shape[4] + 1             # <<<<<<<<<<<<<<
@@ -5847,27 +6295,27 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
   __pyx_v_out_z = ((((__pyx_v_node->dimensions[0]) + (2 * __pyx_v_padding_z)) - (__pyx_v_weight->dimensions[4])) + 1);
 
-  /* "convolve.pyx":230
+  /* "convolve.pyx":247
  *     cdef unsigned int out_y = node.shape[2] + 2*padding_y - weight.shape[3] + 1
  *     cdef unsigned int out_z = node.shape[0] + 2*padding_z - weight.shape[4] + 1
  *     cdef np.ndarray[DTYPE_t, ndim = 4] next_node = np.zeros((out_z, out_x, out_y, weight.shape[0]))             # <<<<<<<<<<<<<<
  * 
  *     cdef unsigned int i,j,x,y,z,row,col,depth
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_z); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_z); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_x); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_x); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_y); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_y); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_weight->dimensions[0])); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_weight->dimensions[0])); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = PyTuple_New(4); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = PyTuple_New(4); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_3);
@@ -5892,28 +6340,28 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
     }
   }
   if (!__pyx_t_7) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_8); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_8); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_7); __Pyx_GIVEREF(__pyx_t_7); __pyx_t_7 = NULL;
     PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_8);
     __Pyx_GIVEREF(__pyx_t_8);
     __pyx_t_8 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_9 = ((PyArrayObject *)__pyx_t_2);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_next_node.rcbuffer->pybuffer, (PyObject*)__pyx_t_9, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 4, 0, __pyx_stack) == -1)) {
       __pyx_v_next_node = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_next_node.rcbuffer->pybuffer.buf = NULL;
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     } else {__pyx_pybuffernd_next_node.diminfo[0].strides = __pyx_pybuffernd_next_node.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_next_node.diminfo[0].shape = __pyx_pybuffernd_next_node.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_next_node.diminfo[1].strides = __pyx_pybuffernd_next_node.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_next_node.diminfo[1].shape = __pyx_pybuffernd_next_node.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_next_node.diminfo[2].strides = __pyx_pybuffernd_next_node.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_next_node.diminfo[2].shape = __pyx_pybuffernd_next_node.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_next_node.diminfo[3].strides = __pyx_pybuffernd_next_node.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_next_node.diminfo[3].shape = __pyx_pybuffernd_next_node.rcbuffer->pybuffer.shape[3];
     }
   }
@@ -5921,7 +6369,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
   __pyx_v_next_node = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "convolve.pyx":235
+  /* "convolve.pyx":252
  *     cdef int node_x, node_y, node_z
  *     cdef unsigned int s
  *     for s in prange(weight.shape[0]*weight.shape[1], nogil=True):             # <<<<<<<<<<<<<<
@@ -5937,18 +6385,18 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
         __pyx_t_10 = ((__pyx_v_weight->dimensions[0]) * (__pyx_v_weight->dimensions[1]));
         if (1 == 0) abort();
         {
-            unsigned int __pyx_parallel_temp0 = 0xbad0bad0;
+            int __pyx_parallel_temp0 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp1 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp2 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp3 = 0xbad0bad0;
-            unsigned int __pyx_parallel_temp4 = 0xbad0bad0;
-            int __pyx_parallel_temp5 = 0xbad0bad0;
+            int __pyx_parallel_temp4 = 0xbad0bad0;
+            unsigned int __pyx_parallel_temp5 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp6 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp7 = 0xbad0bad0;
-            int __pyx_parallel_temp8 = 0xbad0bad0;
+            unsigned int __pyx_parallel_temp8 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp9 = 0xbad0bad0;
-            int __pyx_parallel_temp10 = 0xbad0bad0;
-            unsigned int __pyx_parallel_temp11 = 0xbad0bad0;
+            unsigned int __pyx_parallel_temp10 = 0xbad0bad0;
+            int __pyx_parallel_temp11 = 0xbad0bad0;
             const char *__pyx_parallel_filename = NULL; int __pyx_parallel_lineno = 0, __pyx_parallel_clineno = 0;
             PyObject *__pyx_parallel_exc_type = NULL, *__pyx_parallel_exc_value = NULL, *__pyx_parallel_exc_tb = NULL;
             int __pyx_parallel_why;
@@ -5963,7 +6411,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
             if (__pyx_t_12 > 0)
             {
                 #ifdef _OPENMP
-                #pragma omp parallel private(__pyx_t_15, __pyx_t_17, __pyx_t_14, __pyx_t_38, __pyx_t_23, __pyx_t_1, __pyx_t_29, __pyx_t_34, __pyx_t_24, __pyx_t_21, __pyx_t_18, __pyx_t_31, __pyx_t_26, __pyx_t_32, __pyx_t_37, __pyx_t_19, __pyx_t_33, __pyx_t_13, __pyx_t_22, __pyx_t_28, __pyx_t_30, __pyx_t_27, __pyx_t_16, __pyx_t_36, __pyx_t_35, __pyx_t_25, __pyx_t_20) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
+                #pragma omp parallel private(__pyx_t_29, __pyx_t_19, __pyx_t_25, __pyx_t_20, __pyx_t_22, __pyx_t_27, __pyx_t_13, __pyx_t_21, __pyx_t_31, __pyx_t_38, __pyx_t_1, __pyx_t_34, __pyx_t_16, __pyx_t_24, __pyx_t_37, __pyx_t_30, __pyx_t_35, __pyx_t_32, __pyx_t_33, __pyx_t_36, __pyx_t_15, __pyx_t_14, __pyx_t_18, __pyx_t_17, __pyx_t_23, __pyx_t_26, __pyx_t_28) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
                 #endif /* _OPENMP */
                 {
                     #ifdef _OPENMP
@@ -5973,26 +6421,26 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                     Py_BEGIN_ALLOW_THREADS
                     #endif /* _OPENMP */
                     #ifdef _OPENMP
-                    #pragma omp for lastprivate(__pyx_v_i) lastprivate(__pyx_v_j) lastprivate(__pyx_v_y) lastprivate(__pyx_v_col) lastprivate(__pyx_v_x) lastprivate(__pyx_v_node_x) lastprivate(__pyx_v_z) lastprivate(__pyx_v_depth) lastprivate(__pyx_v_node_z) firstprivate(__pyx_v_s) lastprivate(__pyx_v_s) lastprivate(__pyx_v_node_y) lastprivate(__pyx_v_row)
+                    #pragma omp for lastprivate(__pyx_v_node_x) lastprivate(__pyx_v_y) lastprivate(__pyx_v_row) firstprivate(__pyx_v_s) lastprivate(__pyx_v_s) lastprivate(__pyx_v_node_y) lastprivate(__pyx_v_z) lastprivate(__pyx_v_j) lastprivate(__pyx_v_depth) lastprivate(__pyx_v_i) lastprivate(__pyx_v_col) lastprivate(__pyx_v_x) lastprivate(__pyx_v_node_z)
                     #endif /* _OPENMP */
                     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_12; __pyx_t_11++){
                         if (__pyx_parallel_why < 2)
                         {
                             __pyx_v_s = 0 + 1 * __pyx_t_11;
                             /* Initialize private variables to invalid values */
-                            __pyx_v_i = ((unsigned int)0xbad0bad0);
-                            __pyx_v_j = ((unsigned int)0xbad0bad0);
+                            __pyx_v_node_x = ((int)0xbad0bad0);
                             __pyx_v_y = ((unsigned int)0xbad0bad0);
+                            __pyx_v_row = ((unsigned int)0xbad0bad0);
+                            __pyx_v_node_y = ((int)0xbad0bad0);
+                            __pyx_v_z = ((unsigned int)0xbad0bad0);
+                            __pyx_v_j = ((unsigned int)0xbad0bad0);
+                            __pyx_v_depth = ((unsigned int)0xbad0bad0);
+                            __pyx_v_i = ((unsigned int)0xbad0bad0);
                             __pyx_v_col = ((unsigned int)0xbad0bad0);
                             __pyx_v_x = ((unsigned int)0xbad0bad0);
-                            __pyx_v_node_x = ((int)0xbad0bad0);
-                            __pyx_v_z = ((unsigned int)0xbad0bad0);
-                            __pyx_v_depth = ((unsigned int)0xbad0bad0);
                             __pyx_v_node_z = ((int)0xbad0bad0);
-                            __pyx_v_node_y = ((int)0xbad0bad0);
-                            __pyx_v_row = ((unsigned int)0xbad0bad0);
 
-                            /* "convolve.pyx":236
+                            /* "convolve.pyx":253
  *     cdef unsigned int s
  *     for s in prange(weight.shape[0]*weight.shape[1], nogil=True):
  *         i = s / weight.shape[1]             # <<<<<<<<<<<<<<
@@ -6007,11 +6455,11 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                               #ifdef WITH_THREAD
                               PyGILState_Release(__pyx_gilstate_save);
                               #endif
-                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 236; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
+                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
                             }
                             __pyx_v_i = (__pyx_v_s / (__pyx_v_weight->dimensions[1]));
 
-                            /* "convolve.pyx":237
+                            /* "convolve.pyx":254
  *     for s in prange(weight.shape[0]*weight.shape[1], nogil=True):
  *         i = s / weight.shape[1]
  *         j = s % weight.shape[1]             # <<<<<<<<<<<<<<
@@ -6026,11 +6474,11 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                               #ifdef WITH_THREAD
                               PyGILState_Release(__pyx_gilstate_save);
                               #endif
-                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
+                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
                             }
                             __pyx_v_j = (__pyx_v_s % (__pyx_v_weight->dimensions[1]));
 
-                            /* "convolve.pyx":238
+                            /* "convolve.pyx":255
  *         i = s / weight.shape[1]
  *         j = s % weight.shape[1]
  *         for x in xrange(next_node.shape[1]):             # <<<<<<<<<<<<<<
@@ -6041,7 +6489,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                             for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
                               __pyx_v_x = __pyx_t_14;
 
-                              /* "convolve.pyx":239
+                              /* "convolve.pyx":256
  *         j = s % weight.shape[1]
  *         for x in xrange(next_node.shape[1]):
  *             for y in xrange(next_node.shape[2]):             # <<<<<<<<<<<<<<
@@ -6052,7 +6500,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                               for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
                                 __pyx_v_y = __pyx_t_16;
 
-                                /* "convolve.pyx":240
+                                /* "convolve.pyx":257
  *         for x in xrange(next_node.shape[1]):
  *             for y in xrange(next_node.shape[2]):
  *                 for z in xrange(next_node.shape[0]):             # <<<<<<<<<<<<<<
@@ -6063,7 +6511,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                                 for (__pyx_t_18 = 0; __pyx_t_18 < __pyx_t_17; __pyx_t_18+=1) {
                                   __pyx_v_z = __pyx_t_18;
 
-                                  /* "convolve.pyx":241
+                                  /* "convolve.pyx":258
  *             for y in xrange(next_node.shape[2]):
  *                 for z in xrange(next_node.shape[0]):
  *                     for row in xrange(weight.shape[2]):             # <<<<<<<<<<<<<<
@@ -6074,7 +6522,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                                   for (__pyx_t_20 = 0; __pyx_t_20 < __pyx_t_19; __pyx_t_20+=1) {
                                     __pyx_v_row = __pyx_t_20;
 
-                                    /* "convolve.pyx":242
+                                    /* "convolve.pyx":259
  *                 for z in xrange(next_node.shape[0]):
  *                     for row in xrange(weight.shape[2]):
  *                         for col in xrange(weight.shape[3]):             # <<<<<<<<<<<<<<
@@ -6085,7 +6533,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                                     for (__pyx_t_22 = 0; __pyx_t_22 < __pyx_t_21; __pyx_t_22+=1) {
                                       __pyx_v_col = __pyx_t_22;
 
-                                      /* "convolve.pyx":243
+                                      /* "convolve.pyx":260
  *                     for row in xrange(weight.shape[2]):
  *                         for col in xrange(weight.shape[3]):
  *                             for depth in xrange(weight.shape[4]):             # <<<<<<<<<<<<<<
@@ -6096,7 +6544,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                                       for (__pyx_t_24 = 0; __pyx_t_24 < __pyx_t_23; __pyx_t_24+=1) {
                                         __pyx_v_depth = __pyx_t_24;
 
-                                        /* "convolve.pyx":244
+                                        /* "convolve.pyx":261
  *                         for col in xrange(weight.shape[3]):
  *                             for depth in xrange(weight.shape[4]):
  *                                 node_x = x+row-padding_x             # <<<<<<<<<<<<<<
@@ -6105,7 +6553,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
                                         __pyx_v_node_x = ((__pyx_v_x + __pyx_v_row) - __pyx_v_padding_x);
 
-                                        /* "convolve.pyx":245
+                                        /* "convolve.pyx":262
  *                             for depth in xrange(weight.shape[4]):
  *                                 node_x = x+row-padding_x
  *                                 node_y = y+col-padding_y             # <<<<<<<<<<<<<<
@@ -6114,7 +6562,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
                                         __pyx_v_node_y = ((__pyx_v_y + __pyx_v_col) - __pyx_v_padding_y);
 
-                                        /* "convolve.pyx":246
+                                        /* "convolve.pyx":263
  *                                 node_x = x+row-padding_x
  *                                 node_y = y+col-padding_y
  *                                 node_z = z+depth - padding_z             # <<<<<<<<<<<<<<
@@ -6123,7 +6571,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
  */
                                         __pyx_v_node_z = ((__pyx_v_z + __pyx_v_depth) - __pyx_v_padding_z);
 
-                                        /* "convolve.pyx":247
+                                        /* "convolve.pyx":264
  *                                 node_y = y+col-padding_y
  *                                 node_z = z+depth - padding_z
  *                                 if node_x<0 or node_x>node.shape[1]-1 or node_y<0 or node_y>node.shape[2]-1 or node_z<0 or node_z>node.shape[0]:             # <<<<<<<<<<<<<<
@@ -6175,7 +6623,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                                         __pyx_L25_bool_binop_done:;
                                         if (__pyx_t_1) {
 
-                                          /* "convolve.pyx":248
+                                          /* "convolve.pyx":265
  *                                 node_z = z+depth - padding_z
  *                                 if node_x<0 or node_x>node.shape[1]-1 or node_y<0 or node_y>node.shape[2]-1 or node_z<0 or node_z>node.shape[0]:
  *                                     continue             # <<<<<<<<<<<<<<
@@ -6185,7 +6633,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                                           goto __pyx_L22_continue;
                                         }
 
-                                        /* "convolve.pyx":249
+                                        /* "convolve.pyx":266
  *                                 if node_x<0 or node_x>node.shape[1]-1 or node_y<0 or node_y>node.shape[2]-1 or node_z<0 or node_z>node.shape[0]:
  *                                     continue
  *                                 next_node[z,x,y,i] += node[node_z, node_x, node_y, j] * weight[i,j,row+rotation*(weight.shape[2]-1-2*row),col+rotation*(weight.shape[3]-1-2*col),depth+rotation*(weight.shape[4]-1-2*depth)]             # <<<<<<<<<<<<<<
@@ -6244,18 +6692,18 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
                             #pragma omp critical(__pyx_parallel_lastprivates1)
                             #endif /* _OPENMP */
                             {
-                                __pyx_parallel_temp0 = __pyx_v_i;
-                                __pyx_parallel_temp1 = __pyx_v_j;
-                                __pyx_parallel_temp2 = __pyx_v_y;
-                                __pyx_parallel_temp3 = __pyx_v_col;
-                                __pyx_parallel_temp4 = __pyx_v_x;
-                                __pyx_parallel_temp5 = __pyx_v_node_x;
-                                __pyx_parallel_temp6 = __pyx_v_z;
+                                __pyx_parallel_temp0 = __pyx_v_node_x;
+                                __pyx_parallel_temp1 = __pyx_v_y;
+                                __pyx_parallel_temp2 = __pyx_v_row;
+                                __pyx_parallel_temp3 = __pyx_v_s;
+                                __pyx_parallel_temp4 = __pyx_v_node_y;
+                                __pyx_parallel_temp5 = __pyx_v_z;
+                                __pyx_parallel_temp6 = __pyx_v_j;
                                 __pyx_parallel_temp7 = __pyx_v_depth;
-                                __pyx_parallel_temp8 = __pyx_v_node_z;
-                                __pyx_parallel_temp9 = __pyx_v_s;
-                                __pyx_parallel_temp10 = __pyx_v_node_y;
-                                __pyx_parallel_temp11 = __pyx_v_row;
+                                __pyx_parallel_temp8 = __pyx_v_i;
+                                __pyx_parallel_temp9 = __pyx_v_col;
+                                __pyx_parallel_temp10 = __pyx_v_x;
+                                __pyx_parallel_temp11 = __pyx_v_node_z;
                             }
                             __pyx_L32:;
                             #ifdef _OPENMP
@@ -6285,18 +6733,18 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
               __pyx_parallel_why = 4;
             }
             if (__pyx_parallel_why) {
-              __pyx_v_i = __pyx_parallel_temp0;
-              __pyx_v_j = __pyx_parallel_temp1;
-              __pyx_v_y = __pyx_parallel_temp2;
-              __pyx_v_col = __pyx_parallel_temp3;
-              __pyx_v_x = __pyx_parallel_temp4;
-              __pyx_v_node_x = __pyx_parallel_temp5;
-              __pyx_v_z = __pyx_parallel_temp6;
+              __pyx_v_node_x = __pyx_parallel_temp0;
+              __pyx_v_y = __pyx_parallel_temp1;
+              __pyx_v_row = __pyx_parallel_temp2;
+              __pyx_v_s = __pyx_parallel_temp3;
+              __pyx_v_node_y = __pyx_parallel_temp4;
+              __pyx_v_z = __pyx_parallel_temp5;
+              __pyx_v_j = __pyx_parallel_temp6;
               __pyx_v_depth = __pyx_parallel_temp7;
-              __pyx_v_node_z = __pyx_parallel_temp8;
-              __pyx_v_s = __pyx_parallel_temp9;
-              __pyx_v_node_y = __pyx_parallel_temp10;
-              __pyx_v_row = __pyx_parallel_temp11;
+              __pyx_v_i = __pyx_parallel_temp8;
+              __pyx_v_col = __pyx_parallel_temp9;
+              __pyx_v_x = __pyx_parallel_temp10;
+              __pyx_v_node_z = __pyx_parallel_temp11;
               switch (__pyx_parallel_why) {
                     case 3: goto __pyx_L5_return;
                     case 4:
@@ -6323,7 +6771,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
         #endif
       }
 
-      /* "convolve.pyx":235
+      /* "convolve.pyx":252
  *     cdef int node_x, node_y, node_z
  *     cdef unsigned int s
  *     for s in prange(weight.shape[0]*weight.shape[1], nogil=True):             # <<<<<<<<<<<<<<
@@ -6353,7 +6801,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
       }
   }
 
-  /* "convolve.pyx":266
+  /* "convolve.pyx":283
  *     #                                 next_node[z,x,y,i] += node[node_z, node_x, node_y, j] * weight[i,j,row+rotation*(weight.shape[2]-1-2*row),col+rotation*(weight.shape[3]-1-2*col),depth+rotation*(weight.shape[4]-1-2*depth)]
  * 
  *     return next_node             # <<<<<<<<<<<<<<
@@ -6365,7 +6813,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
   __pyx_r = ((PyObject *)__pyx_v_next_node);
   goto __pyx_L0;
 
-  /* "convolve.pyx":210
+  /* "convolve.pyx":227
  * 
  * @cython.boundscheck(False)
  * def convolve4d_forward(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
@@ -6402,7 +6850,7 @@ static PyObject *__pyx_pf_8convolve_12convolve4d_forward(CYTHON_UNUSED PyObject 
   return __pyx_r;
 }
 
-/* "convolve.pyx":269
+/* "convolve.pyx":286
  * 
  * @cython.boundscheck(False)
  * def convolve4d_backward(np.ndarray[DTYPE_t, ndim = 4] next_derr, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
@@ -6454,7 +6902,7 @@ static PyObject *__pyx_pw_8convolve_15convolve4d_backward(PyObject *__pyx_self, 
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_weight)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("convolve4d_backward", 0, 2, 8, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("convolve4d_backward", 0, 2, 8, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (kw_args > 0) {
@@ -6488,7 +6936,7 @@ static PyObject *__pyx_pw_8convolve_15convolve4d_backward(PyObject *__pyx_self, 
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "convolve4d_backward") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "convolve4d_backward") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -6507,46 +6955,46 @@ static PyObject *__pyx_pw_8convolve_15convolve4d_backward(PyObject *__pyx_self, 
     __pyx_v_next_derr = ((PyArrayObject *)values[0]);
     __pyx_v_weight = ((PyArrayObject *)values[1]);
     if (values[2]) {
-      __pyx_v_mode = __Pyx_PyObject_AsString(values[2]); if (unlikely((!__pyx_v_mode) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_mode = __Pyx_PyObject_AsString(values[2]); if (unlikely((!__pyx_v_mode) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_mode = ((char *)__pyx_k_valid);
     }
     if (values[3]) {
-      __pyx_v_padding_x = __Pyx_PyInt_As_unsigned_int(values[3]); if (unlikely((__pyx_v_padding_x == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_x = __Pyx_PyInt_As_unsigned_int(values[3]); if (unlikely((__pyx_v_padding_x == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_x = ((unsigned int)0);
     }
     if (values[4]) {
-      __pyx_v_padding_y = __Pyx_PyInt_As_unsigned_int(values[4]); if (unlikely((__pyx_v_padding_y == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_y = __Pyx_PyInt_As_unsigned_int(values[4]); if (unlikely((__pyx_v_padding_y == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_y = ((unsigned int)0);
     }
     if (values[5]) {
-      __pyx_v_padding_z = __Pyx_PyInt_As_unsigned_int(values[5]); if (unlikely((__pyx_v_padding_z == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_z = __Pyx_PyInt_As_unsigned_int(values[5]); if (unlikely((__pyx_v_padding_z == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_z = ((unsigned int)0);
     }
     if (values[6]) {
-      __pyx_v_padding_flug = __Pyx_PyInt_As_unsigned_int(values[6]); if (unlikely((__pyx_v_padding_flug == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_flug = __Pyx_PyInt_As_unsigned_int(values[6]); if (unlikely((__pyx_v_padding_flug == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_flug = ((unsigned int)0);
     }
     if (values[7]) {
-      __pyx_v_rotation = __Pyx_PyInt_As_unsigned_int(values[7]); if (unlikely((__pyx_v_rotation == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_rotation = __Pyx_PyInt_As_unsigned_int(values[7]); if (unlikely((__pyx_v_rotation == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_rotation = ((unsigned int)0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("convolve4d_backward", 0, 2, 8, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("convolve4d_backward", 0, 2, 8, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("convolve.convolve4d_backward", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_next_derr), __pyx_ptype_5numpy_ndarray, 1, "next_derr", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_weight), __pyx_ptype_5numpy_ndarray, 1, "weight", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_next_derr), __pyx_ptype_5numpy_ndarray, 1, "next_derr", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_weight), __pyx_ptype_5numpy_ndarray, 1, "weight", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_8convolve_14convolve4d_backward(__pyx_self, __pyx_v_next_derr, __pyx_v_weight, __pyx_v_mode, __pyx_v_padding_x, __pyx_v_padding_y, __pyx_v_padding_z, __pyx_v_padding_flug, __pyx_v_rotation);
 
   /* function exit code */
@@ -6639,16 +7087,16 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
   __pyx_pybuffernd_weight.rcbuffer = &__pyx_pybuffer_weight;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_next_derr.rcbuffer->pybuffer, (PyObject*)__pyx_v_next_derr, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_next_derr.rcbuffer->pybuffer, (PyObject*)__pyx_v_next_derr, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_next_derr.diminfo[0].strides = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_next_derr.diminfo[0].shape = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_next_derr.diminfo[1].strides = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_next_derr.diminfo[1].shape = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_next_derr.diminfo[2].strides = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_next_derr.diminfo[2].shape = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_next_derr.diminfo[3].strides = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_next_derr.diminfo[3].shape = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.shape[3];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_weight.rcbuffer->pybuffer, (PyObject*)__pyx_v_weight, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 5, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_weight.rcbuffer->pybuffer, (PyObject*)__pyx_v_weight, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 5, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_weight.diminfo[0].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_weight.diminfo[0].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_weight.diminfo[1].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_weight.diminfo[1].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_weight.diminfo[2].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_weight.diminfo[2].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_weight.diminfo[3].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_weight.diminfo[3].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[3]; __pyx_pybuffernd_weight.diminfo[4].strides = __pyx_pybuffernd_weight.rcbuffer->pybuffer.strides[4]; __pyx_pybuffernd_weight.diminfo[4].shape = __pyx_pybuffernd_weight.rcbuffer->pybuffer.shape[4];
 
-  /* "convolve.pyx":270
+  /* "convolve.pyx":287
  * @cython.boundscheck(False)
  * def convolve4d_backward(np.ndarray[DTYPE_t, ndim = 4] next_derr, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):
  *     if padding_flug ==0:             # <<<<<<<<<<<<<<
@@ -6658,7 +7106,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
   __pyx_t_1 = ((__pyx_v_padding_flug == 0) != 0);
   if (__pyx_t_1) {
 
-    /* "convolve.pyx":271
+    /* "convolve.pyx":288
  * def convolve4d_backward(np.ndarray[DTYPE_t, ndim = 4] next_derr, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):
  *     if padding_flug ==0:
  *         if not strcmp(mode,'valid'):             # <<<<<<<<<<<<<<
@@ -6668,7 +7116,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
     __pyx_t_1 = ((!(strcmp(__pyx_v_mode, __pyx_k_valid) != 0)) != 0);
     if (__pyx_t_1) {
 
-      /* "convolve.pyx":272
+      /* "convolve.pyx":289
  *     if padding_flug ==0:
  *         if not strcmp(mode,'valid'):
  *             padding_x = 0             # <<<<<<<<<<<<<<
@@ -6677,7 +7125,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
  */
       __pyx_v_padding_x = 0;
 
-      /* "convolve.pyx":273
+      /* "convolve.pyx":290
  *         if not strcmp(mode,'valid'):
  *             padding_x = 0
  *             padding_y = 0             # <<<<<<<<<<<<<<
@@ -6686,7 +7134,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
  */
       __pyx_v_padding_y = 0;
 
-      /* "convolve.pyx":274
+      /* "convolve.pyx":291
  *             padding_x = 0
  *             padding_y = 0
  *             padding_z = 0             # <<<<<<<<<<<<<<
@@ -6697,7 +7145,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
       goto __pyx_L4;
     }
 
-    /* "convolve.pyx":275
+    /* "convolve.pyx":292
  *             padding_y = 0
  *             padding_z = 0
  *         elif not strcmp(mode,'same'):             # <<<<<<<<<<<<<<
@@ -6707,7 +7155,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
     __pyx_t_1 = ((!(strcmp(__pyx_v_mode, __pyx_k_same) != 0)) != 0);
     if (__pyx_t_1) {
 
-      /* "convolve.pyx":276
+      /* "convolve.pyx":293
  *             padding_z = 0
  *         elif not strcmp(mode,'same'):
  *             padding_x = (weight.shape[2] - 1) / 2             # <<<<<<<<<<<<<<
@@ -6716,7 +7164,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
  */
       __pyx_v_padding_x = __Pyx_div_long(((__pyx_v_weight->dimensions[2]) - 1), 2);
 
-      /* "convolve.pyx":277
+      /* "convolve.pyx":294
  *         elif not strcmp(mode,'same'):
  *             padding_x = (weight.shape[2] - 1) / 2
  *             padding_y = (weight.shape[3] - 1) / 2             # <<<<<<<<<<<<<<
@@ -6725,7 +7173,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
  */
       __pyx_v_padding_y = __Pyx_div_long(((__pyx_v_weight->dimensions[3]) - 1), 2);
 
-      /* "convolve.pyx":278
+      /* "convolve.pyx":295
  *             padding_x = (weight.shape[2] - 1) / 2
  *             padding_y = (weight.shape[3] - 1) / 2
  *             padding_z = (weight.shape[4] - 1) / 2             # <<<<<<<<<<<<<<
@@ -6736,7 +7184,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
       goto __pyx_L4;
     }
 
-    /* "convolve.pyx":279
+    /* "convolve.pyx":296
  *             padding_y = (weight.shape[3] - 1) / 2
  *             padding_z = (weight.shape[4] - 1) / 2
  *         elif not strcmp(mode,'full'):             # <<<<<<<<<<<<<<
@@ -6746,7 +7194,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
     __pyx_t_1 = ((!(strcmp(__pyx_v_mode, __pyx_k_full) != 0)) != 0);
     if (__pyx_t_1) {
 
-      /* "convolve.pyx":280
+      /* "convolve.pyx":297
  *             padding_z = (weight.shape[4] - 1) / 2
  *         elif not strcmp(mode,'full'):
  *             padding_x = weight.shape[2] - 1             # <<<<<<<<<<<<<<
@@ -6755,7 +7203,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
  */
       __pyx_v_padding_x = ((__pyx_v_weight->dimensions[2]) - 1);
 
-      /* "convolve.pyx":281
+      /* "convolve.pyx":298
  *         elif not strcmp(mode,'full'):
  *             padding_x = weight.shape[2] - 1
  *             padding_y = weight.shape[3] - 1             # <<<<<<<<<<<<<<
@@ -6764,7 +7212,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
  */
       __pyx_v_padding_y = ((__pyx_v_weight->dimensions[3]) - 1);
 
-      /* "convolve.pyx":282
+      /* "convolve.pyx":299
  *             padding_x = weight.shape[2] - 1
  *             padding_y = weight.shape[3] - 1
  *             padding_z = weight.shape[4] - 1             # <<<<<<<<<<<<<<
@@ -6776,25 +7224,25 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
     }
     /*else*/ {
 
-      /* "convolve.pyx":284
+      /* "convolve.pyx":301
  *             padding_z = weight.shape[4] - 1
  *         else:
  *             raise NameError('unsupported mode for convolve3d')             # <<<<<<<<<<<<<<
  * 
  *     cdef unsigned int out_x = next_derr.shape[1] + 2*padding_x - weight.shape[2] + 1
  */
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_NameError, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_NameError, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 301; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_Raise(__pyx_t_2, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 301; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __pyx_L4:;
     goto __pyx_L3;
   }
   __pyx_L3:;
 
-  /* "convolve.pyx":286
+  /* "convolve.pyx":303
  *             raise NameError('unsupported mode for convolve3d')
  * 
  *     cdef unsigned int out_x = next_derr.shape[1] + 2*padding_x - weight.shape[2] + 1             # <<<<<<<<<<<<<<
@@ -6803,7 +7251,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
  */
   __pyx_v_out_x = ((((__pyx_v_next_derr->dimensions[1]) + (2 * __pyx_v_padding_x)) - (__pyx_v_weight->dimensions[2])) + 1);
 
-  /* "convolve.pyx":287
+  /* "convolve.pyx":304
  * 
  *     cdef unsigned int out_x = next_derr.shape[1] + 2*padding_x - weight.shape[2] + 1
  *     cdef unsigned int out_y = next_derr.shape[2] + 2*padding_y - weight.shape[3] + 1             # <<<<<<<<<<<<<<
@@ -6812,7 +7260,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
  */
   __pyx_v_out_y = ((((__pyx_v_next_derr->dimensions[2]) + (2 * __pyx_v_padding_y)) - (__pyx_v_weight->dimensions[3])) + 1);
 
-  /* "convolve.pyx":288
+  /* "convolve.pyx":305
  *     cdef unsigned int out_x = next_derr.shape[1] + 2*padding_x - weight.shape[2] + 1
  *     cdef unsigned int out_y = next_derr.shape[2] + 2*padding_y - weight.shape[3] + 1
  *     cdef unsigned int out_z = next_derr.shape[0] + 2*padding_z - weight.shape[4] + 1             # <<<<<<<<<<<<<<
@@ -6821,27 +7269,27 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
  */
   __pyx_v_out_z = ((((__pyx_v_next_derr->dimensions[0]) + (2 * __pyx_v_padding_z)) - (__pyx_v_weight->dimensions[4])) + 1);
 
-  /* "convolve.pyx":289
+  /* "convolve.pyx":306
  *     cdef unsigned int out_y = next_derr.shape[2] + 2*padding_y - weight.shape[3] + 1
  *     cdef unsigned int out_z = next_derr.shape[0] + 2*padding_z - weight.shape[4] + 1
  *     cdef np.ndarray[DTYPE_t, ndim = 4] derr = np.zeros((out_z, out_x, out_y, weight.shape[1]))             # <<<<<<<<<<<<<<
  * 
  *     cdef unsigned int i,j,x,y,z,row,col,depth
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_z); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_z); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_x); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_x); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_y); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_y); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_weight->dimensions[1])); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_weight->dimensions[1])); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = PyTuple_New(4); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = PyTuple_New(4); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_3);
@@ -6866,28 +7314,28 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
     }
   }
   if (!__pyx_t_7) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_8); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_8); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_7); __Pyx_GIVEREF(__pyx_t_7); __pyx_t_7 = NULL;
     PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_8);
     __Pyx_GIVEREF(__pyx_t_8);
     __pyx_t_8 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_9 = ((PyArrayObject *)__pyx_t_2);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_derr.rcbuffer->pybuffer, (PyObject*)__pyx_t_9, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 4, 0, __pyx_stack) == -1)) {
       __pyx_v_derr = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_derr.rcbuffer->pybuffer.buf = NULL;
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     } else {__pyx_pybuffernd_derr.diminfo[0].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_derr.diminfo[0].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_derr.diminfo[1].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_derr.diminfo[1].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_derr.diminfo[2].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_derr.diminfo[2].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_derr.diminfo[3].strides = __pyx_pybuffernd_derr.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_derr.diminfo[3].shape = __pyx_pybuffernd_derr.rcbuffer->pybuffer.shape[3];
     }
   }
@@ -6895,7 +7343,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
   __pyx_v_derr = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "convolve.pyx":294
+  /* "convolve.pyx":311
  *     cdef int node_x, node_y, node_z
  *     cdef unsigned int s
  *     for s in prange(weight.shape[0]*weight.shape[1], nogil=True):             # <<<<<<<<<<<<<<
@@ -6912,16 +7360,16 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
         if (1 == 0) abort();
         {
             unsigned int __pyx_parallel_temp0 = 0xbad0bad0;
-            int __pyx_parallel_temp1 = 0xbad0bad0;
-            unsigned int __pyx_parallel_temp2 = 0xbad0bad0;
-            unsigned int __pyx_parallel_temp3 = 0xbad0bad0;
+            unsigned int __pyx_parallel_temp1 = 0xbad0bad0;
+            int __pyx_parallel_temp2 = 0xbad0bad0;
+            int __pyx_parallel_temp3 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp4 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp5 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp6 = 0xbad0bad0;
-            unsigned int __pyx_parallel_temp7 = 0xbad0bad0;
+            int __pyx_parallel_temp7 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp8 = 0xbad0bad0;
-            int __pyx_parallel_temp9 = 0xbad0bad0;
-            int __pyx_parallel_temp10 = 0xbad0bad0;
+            unsigned int __pyx_parallel_temp9 = 0xbad0bad0;
+            unsigned int __pyx_parallel_temp10 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp11 = 0xbad0bad0;
             const char *__pyx_parallel_filename = NULL; int __pyx_parallel_lineno = 0, __pyx_parallel_clineno = 0;
             PyObject *__pyx_parallel_exc_type = NULL, *__pyx_parallel_exc_value = NULL, *__pyx_parallel_exc_tb = NULL;
@@ -6937,7 +7385,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
             if (__pyx_t_12 > 0)
             {
                 #ifdef _OPENMP
-                #pragma omp parallel private(__pyx_t_15, __pyx_t_17, __pyx_t_14, __pyx_t_38, __pyx_t_23, __pyx_t_1, __pyx_t_29, __pyx_t_34, __pyx_t_24, __pyx_t_21, __pyx_t_18, __pyx_t_31, __pyx_t_26, __pyx_t_32, __pyx_t_37, __pyx_t_19, __pyx_t_33, __pyx_t_13, __pyx_t_22, __pyx_t_28, __pyx_t_30, __pyx_t_27, __pyx_t_16, __pyx_t_36, __pyx_t_35, __pyx_t_25, __pyx_t_20) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
+                #pragma omp parallel private(__pyx_t_29, __pyx_t_19, __pyx_t_25, __pyx_t_20, __pyx_t_22, __pyx_t_27, __pyx_t_13, __pyx_t_21, __pyx_t_31, __pyx_t_38, __pyx_t_1, __pyx_t_34, __pyx_t_16, __pyx_t_24, __pyx_t_37, __pyx_t_30, __pyx_t_35, __pyx_t_32, __pyx_t_33, __pyx_t_36, __pyx_t_15, __pyx_t_14, __pyx_t_18, __pyx_t_17, __pyx_t_23, __pyx_t_26, __pyx_t_28) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
                 #endif /* _OPENMP */
                 {
                     #ifdef _OPENMP
@@ -6947,26 +7395,26 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                     Py_BEGIN_ALLOW_THREADS
                     #endif /* _OPENMP */
                     #ifdef _OPENMP
-                    #pragma omp for lastprivate(__pyx_v_i) lastprivate(__pyx_v_node_z) lastprivate(__pyx_v_j) lastprivate(__pyx_v_y) lastprivate(__pyx_v_x) lastprivate(__pyx_v_row) lastprivate(__pyx_v_depth) firstprivate(__pyx_v_s) lastprivate(__pyx_v_s) lastprivate(__pyx_v_z) lastprivate(__pyx_v_node_x) lastprivate(__pyx_v_node_y) lastprivate(__pyx_v_col)
+                    #pragma omp for lastprivate(__pyx_v_y) firstprivate(__pyx_v_s) lastprivate(__pyx_v_s) lastprivate(__pyx_v_node_x) lastprivate(__pyx_v_node_y) lastprivate(__pyx_v_x) lastprivate(__pyx_v_j) lastprivate(__pyx_v_i) lastprivate(__pyx_v_node_z) lastprivate(__pyx_v_row) lastprivate(__pyx_v_depth) lastprivate(__pyx_v_z) lastprivate(__pyx_v_col)
                     #endif /* _OPENMP */
                     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_12; __pyx_t_11++){
                         if (__pyx_parallel_why < 2)
                         {
                             __pyx_v_s = 0 + 1 * __pyx_t_11;
                             /* Initialize private variables to invalid values */
+                            __pyx_v_y = ((unsigned int)0xbad0bad0);
+                            __pyx_v_node_x = ((int)0xbad0bad0);
+                            __pyx_v_node_y = ((int)0xbad0bad0);
+                            __pyx_v_x = ((unsigned int)0xbad0bad0);
+                            __pyx_v_j = ((unsigned int)0xbad0bad0);
                             __pyx_v_i = ((unsigned int)0xbad0bad0);
                             __pyx_v_node_z = ((int)0xbad0bad0);
-                            __pyx_v_j = ((unsigned int)0xbad0bad0);
-                            __pyx_v_y = ((unsigned int)0xbad0bad0);
-                            __pyx_v_x = ((unsigned int)0xbad0bad0);
                             __pyx_v_row = ((unsigned int)0xbad0bad0);
                             __pyx_v_depth = ((unsigned int)0xbad0bad0);
                             __pyx_v_z = ((unsigned int)0xbad0bad0);
-                            __pyx_v_node_x = ((int)0xbad0bad0);
-                            __pyx_v_node_y = ((int)0xbad0bad0);
                             __pyx_v_col = ((unsigned int)0xbad0bad0);
 
-                            /* "convolve.pyx":295
+                            /* "convolve.pyx":312
  *     cdef unsigned int s
  *     for s in prange(weight.shape[0]*weight.shape[1], nogil=True):
  *         i = s / weight.shape[1]             # <<<<<<<<<<<<<<
@@ -6981,11 +7429,11 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                               #ifdef WITH_THREAD
                               PyGILState_Release(__pyx_gilstate_save);
                               #endif
-                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 295; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
+                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
                             }
                             __pyx_v_i = (__pyx_v_s / (__pyx_v_weight->dimensions[1]));
 
-                            /* "convolve.pyx":296
+                            /* "convolve.pyx":313
  *     for s in prange(weight.shape[0]*weight.shape[1], nogil=True):
  *         i = s / weight.shape[1]
  *         j = s % weight.shape[1]             # <<<<<<<<<<<<<<
@@ -7000,11 +7448,11 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                               #ifdef WITH_THREAD
                               PyGILState_Release(__pyx_gilstate_save);
                               #endif
-                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 296; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
+                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 313; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
                             }
                             __pyx_v_j = (__pyx_v_s % (__pyx_v_weight->dimensions[1]));
 
-                            /* "convolve.pyx":297
+                            /* "convolve.pyx":314
  *         i = s / weight.shape[1]
  *         j = s % weight.shape[1]
  *         for x in xrange(derr.shape[1]):             # <<<<<<<<<<<<<<
@@ -7015,7 +7463,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                             for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
                               __pyx_v_x = __pyx_t_14;
 
-                              /* "convolve.pyx":298
+                              /* "convolve.pyx":315
  *         j = s % weight.shape[1]
  *         for x in xrange(derr.shape[1]):
  *             for y in xrange(derr.shape[2]):             # <<<<<<<<<<<<<<
@@ -7026,7 +7474,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                               for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
                                 __pyx_v_y = __pyx_t_16;
 
-                                /* "convolve.pyx":299
+                                /* "convolve.pyx":316
  *         for x in xrange(derr.shape[1]):
  *             for y in xrange(derr.shape[2]):
  *                 for z in xrange(derr.shape[0]):             # <<<<<<<<<<<<<<
@@ -7037,7 +7485,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                                 for (__pyx_t_18 = 0; __pyx_t_18 < __pyx_t_17; __pyx_t_18+=1) {
                                   __pyx_v_z = __pyx_t_18;
 
-                                  /* "convolve.pyx":300
+                                  /* "convolve.pyx":317
  *             for y in xrange(derr.shape[2]):
  *                 for z in xrange(derr.shape[0]):
  *                     for row in xrange(weight.shape[2]):             # <<<<<<<<<<<<<<
@@ -7048,7 +7496,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                                   for (__pyx_t_20 = 0; __pyx_t_20 < __pyx_t_19; __pyx_t_20+=1) {
                                     __pyx_v_row = __pyx_t_20;
 
-                                    /* "convolve.pyx":301
+                                    /* "convolve.pyx":318
  *                 for z in xrange(derr.shape[0]):
  *                     for row in xrange(weight.shape[2]):
  *                         for col in xrange(weight.shape[3]):             # <<<<<<<<<<<<<<
@@ -7059,7 +7507,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                                     for (__pyx_t_22 = 0; __pyx_t_22 < __pyx_t_21; __pyx_t_22+=1) {
                                       __pyx_v_col = __pyx_t_22;
 
-                                      /* "convolve.pyx":302
+                                      /* "convolve.pyx":319
  *                     for row in xrange(weight.shape[2]):
  *                         for col in xrange(weight.shape[3]):
  *                             for depth in xrange(weight.shape[4]):             # <<<<<<<<<<<<<<
@@ -7070,7 +7518,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                                       for (__pyx_t_24 = 0; __pyx_t_24 < __pyx_t_23; __pyx_t_24+=1) {
                                         __pyx_v_depth = __pyx_t_24;
 
-                                        /* "convolve.pyx":303
+                                        /* "convolve.pyx":320
  *                         for col in xrange(weight.shape[3]):
  *                             for depth in xrange(weight.shape[4]):
  *                                 node_x = x+row-padding_x             # <<<<<<<<<<<<<<
@@ -7079,28 +7527,28 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
  */
                                         __pyx_v_node_x = ((__pyx_v_x + __pyx_v_row) - __pyx_v_padding_x);
 
-                                        /* "convolve.pyx":304
+                                        /* "convolve.pyx":321
  *                             for depth in xrange(weight.shape[4]):
  *                                 node_x = x+row-padding_x
  *                                 node_y = y+col-padding_y             # <<<<<<<<<<<<<<
  *                                 node_z = z+depth - padding_z
- *                                 if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]:
+ *                                 if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]-1:
  */
                                         __pyx_v_node_y = ((__pyx_v_y + __pyx_v_col) - __pyx_v_padding_y);
 
-                                        /* "convolve.pyx":305
+                                        /* "convolve.pyx":322
  *                                 node_x = x+row-padding_x
  *                                 node_y = y+col-padding_y
  *                                 node_z = z+depth - padding_z             # <<<<<<<<<<<<<<
- *                                 if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]:
+ *                                 if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]-1:
  *                                     continue
  */
                                         __pyx_v_node_z = ((__pyx_v_z + __pyx_v_depth) - __pyx_v_padding_z);
 
-                                        /* "convolve.pyx":306
+                                        /* "convolve.pyx":323
  *                                 node_y = y+col-padding_y
  *                                 node_z = z+depth - padding_z
- *                                 if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]:             # <<<<<<<<<<<<<<
+ *                                 if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]-1:             # <<<<<<<<<<<<<<
  *                                     continue
  *                                 derr[z,x,y,j] += next_derr[node_z, node_x, node_y, i] * weight[i,j,row+rotation*(weight.shape[2]-1-2*row),col+rotation*(weight.shape[3]-1-2*col),depth+rotation*(weight.shape[4]-1-2*depth)]
  */
@@ -7144,14 +7592,14 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                                           goto __pyx_L25_bool_binop_done;
                                         }
                                         __pyx_L30_next_or:;
-                                        __pyx_t_25 = ((__pyx_v_node_z > (__pyx_v_next_derr->dimensions[0])) != 0);
+                                        __pyx_t_25 = ((__pyx_v_node_z > ((__pyx_v_next_derr->dimensions[0]) - 1)) != 0);
                                         __pyx_t_1 = __pyx_t_25;
                                         __pyx_L25_bool_binop_done:;
                                         if (__pyx_t_1) {
 
-                                          /* "convolve.pyx":307
+                                          /* "convolve.pyx":324
  *                                 node_z = z+depth - padding_z
- *                                 if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]:
+ *                                 if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]-1:
  *                                     continue             # <<<<<<<<<<<<<<
  *                                 derr[z,x,y,j] += next_derr[node_z, node_x, node_y, i] * weight[i,j,row+rotation*(weight.shape[2]-1-2*row),col+rotation*(weight.shape[3]-1-2*col),depth+rotation*(weight.shape[4]-1-2*depth)]
  * 
@@ -7159,8 +7607,8 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                                           goto __pyx_L22_continue;
                                         }
 
-                                        /* "convolve.pyx":308
- *                                 if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]:
+                                        /* "convolve.pyx":325
+ *                                 if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]-1:
  *                                     continue
  *                                 derr[z,x,y,j] += next_derr[node_z, node_x, node_y, i] * weight[i,j,row+rotation*(weight.shape[2]-1-2*row),col+rotation*(weight.shape[3]-1-2*col),depth+rotation*(weight.shape[4]-1-2*depth)]             # <<<<<<<<<<<<<<
  * 
@@ -7218,17 +7666,17 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
                             #pragma omp critical(__pyx_parallel_lastprivates2)
                             #endif /* _OPENMP */
                             {
-                                __pyx_parallel_temp0 = __pyx_v_i;
-                                __pyx_parallel_temp1 = __pyx_v_node_z;
-                                __pyx_parallel_temp2 = __pyx_v_j;
-                                __pyx_parallel_temp3 = __pyx_v_y;
+                                __pyx_parallel_temp0 = __pyx_v_y;
+                                __pyx_parallel_temp1 = __pyx_v_s;
+                                __pyx_parallel_temp2 = __pyx_v_node_x;
+                                __pyx_parallel_temp3 = __pyx_v_node_y;
                                 __pyx_parallel_temp4 = __pyx_v_x;
-                                __pyx_parallel_temp5 = __pyx_v_row;
-                                __pyx_parallel_temp6 = __pyx_v_depth;
-                                __pyx_parallel_temp7 = __pyx_v_s;
-                                __pyx_parallel_temp8 = __pyx_v_z;
-                                __pyx_parallel_temp9 = __pyx_v_node_x;
-                                __pyx_parallel_temp10 = __pyx_v_node_y;
+                                __pyx_parallel_temp5 = __pyx_v_j;
+                                __pyx_parallel_temp6 = __pyx_v_i;
+                                __pyx_parallel_temp7 = __pyx_v_node_z;
+                                __pyx_parallel_temp8 = __pyx_v_row;
+                                __pyx_parallel_temp9 = __pyx_v_depth;
+                                __pyx_parallel_temp10 = __pyx_v_z;
                                 __pyx_parallel_temp11 = __pyx_v_col;
                             }
                             __pyx_L32:;
@@ -7259,17 +7707,17 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
               __pyx_parallel_why = 4;
             }
             if (__pyx_parallel_why) {
-              __pyx_v_i = __pyx_parallel_temp0;
-              __pyx_v_node_z = __pyx_parallel_temp1;
-              __pyx_v_j = __pyx_parallel_temp2;
-              __pyx_v_y = __pyx_parallel_temp3;
+              __pyx_v_y = __pyx_parallel_temp0;
+              __pyx_v_s = __pyx_parallel_temp1;
+              __pyx_v_node_x = __pyx_parallel_temp2;
+              __pyx_v_node_y = __pyx_parallel_temp3;
               __pyx_v_x = __pyx_parallel_temp4;
-              __pyx_v_row = __pyx_parallel_temp5;
-              __pyx_v_depth = __pyx_parallel_temp6;
-              __pyx_v_s = __pyx_parallel_temp7;
-              __pyx_v_z = __pyx_parallel_temp8;
-              __pyx_v_node_x = __pyx_parallel_temp9;
-              __pyx_v_node_y = __pyx_parallel_temp10;
+              __pyx_v_j = __pyx_parallel_temp5;
+              __pyx_v_i = __pyx_parallel_temp6;
+              __pyx_v_node_z = __pyx_parallel_temp7;
+              __pyx_v_row = __pyx_parallel_temp8;
+              __pyx_v_depth = __pyx_parallel_temp9;
+              __pyx_v_z = __pyx_parallel_temp10;
               __pyx_v_col = __pyx_parallel_temp11;
               switch (__pyx_parallel_why) {
                     case 3: goto __pyx_L5_return;
@@ -7297,7 +7745,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
         #endif
       }
 
-      /* "convolve.pyx":294
+      /* "convolve.pyx":311
  *     cdef int node_x, node_y, node_z
  *     cdef unsigned int s
  *     for s in prange(weight.shape[0]*weight.shape[1], nogil=True):             # <<<<<<<<<<<<<<
@@ -7327,7 +7775,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
       }
   }
 
-  /* "convolve.pyx":310
+  /* "convolve.pyx":327
  *                                 derr[z,x,y,j] += next_derr[node_z, node_x, node_y, i] * weight[i,j,row+rotation*(weight.shape[2]-1-2*row),col+rotation*(weight.shape[3]-1-2*col),depth+rotation*(weight.shape[4]-1-2*depth)]
  * 
  *     return derr             # <<<<<<<<<<<<<<
@@ -7339,7 +7787,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
   __pyx_r = ((PyObject *)__pyx_v_derr);
   goto __pyx_L0;
 
-  /* "convolve.pyx":269
+  /* "convolve.pyx":286
  * 
  * @cython.boundscheck(False)
  * def convolve4d_backward(np.ndarray[DTYPE_t, ndim = 4] next_derr, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
@@ -7376,7 +7824,7 @@ static PyObject *__pyx_pf_8convolve_14convolve4d_backward(CYTHON_UNUSED PyObject
   return __pyx_r;
 }
 
-/* "convolve.pyx":316
+/* "convolve.pyx":333
  * 
  * @cython.boundscheck(False)
  * def convolve4d_dweight(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 4] next_derr, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
@@ -7428,7 +7876,7 @@ static PyObject *__pyx_pw_8convolve_17convolve4d_dweight(PyObject *__pyx_self, P
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_next_derr)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("convolve4d_dweight", 0, 2, 8, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("convolve4d_dweight", 0, 2, 8, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (kw_args > 0) {
@@ -7462,7 +7910,7 @@ static PyObject *__pyx_pw_8convolve_17convolve4d_dweight(PyObject *__pyx_self, P
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "convolve4d_dweight") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "convolve4d_dweight") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -7481,46 +7929,46 @@ static PyObject *__pyx_pw_8convolve_17convolve4d_dweight(PyObject *__pyx_self, P
     __pyx_v_node = ((PyArrayObject *)values[0]);
     __pyx_v_next_derr = ((PyArrayObject *)values[1]);
     if (values[2]) {
-      __pyx_v_mode = __Pyx_PyObject_AsString(values[2]); if (unlikely((!__pyx_v_mode) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_mode = __Pyx_PyObject_AsString(values[2]); if (unlikely((!__pyx_v_mode) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_mode = ((char *)__pyx_k_valid);
     }
     if (values[3]) {
-      __pyx_v_padding_x = __Pyx_PyInt_As_unsigned_int(values[3]); if (unlikely((__pyx_v_padding_x == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_x = __Pyx_PyInt_As_unsigned_int(values[3]); if (unlikely((__pyx_v_padding_x == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_x = ((unsigned int)0);
     }
     if (values[4]) {
-      __pyx_v_padding_y = __Pyx_PyInt_As_unsigned_int(values[4]); if (unlikely((__pyx_v_padding_y == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_y = __Pyx_PyInt_As_unsigned_int(values[4]); if (unlikely((__pyx_v_padding_y == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_y = ((unsigned int)0);
     }
     if (values[5]) {
-      __pyx_v_padding_z = __Pyx_PyInt_As_unsigned_int(values[5]); if (unlikely((__pyx_v_padding_z == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_z = __Pyx_PyInt_As_unsigned_int(values[5]); if (unlikely((__pyx_v_padding_z == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_z = ((unsigned int)0);
     }
     if (values[6]) {
-      __pyx_v_padding_flug = __Pyx_PyInt_As_unsigned_int(values[6]); if (unlikely((__pyx_v_padding_flug == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_padding_flug = __Pyx_PyInt_As_unsigned_int(values[6]); if (unlikely((__pyx_v_padding_flug == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_padding_flug = ((unsigned int)0);
     }
     if (values[7]) {
-      __pyx_v_rotation = __Pyx_PyInt_As_unsigned_int(values[7]); if (unlikely((__pyx_v_rotation == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_rotation = __Pyx_PyInt_As_unsigned_int(values[7]); if (unlikely((__pyx_v_rotation == (unsigned int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_rotation = ((unsigned int)0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("convolve4d_dweight", 0, 2, 8, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("convolve4d_dweight", 0, 2, 8, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("convolve.convolve4d_dweight", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_node), __pyx_ptype_5numpy_ndarray, 1, "node", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_next_derr), __pyx_ptype_5numpy_ndarray, 1, "next_derr", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_node), __pyx_ptype_5numpy_ndarray, 1, "node", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_next_derr), __pyx_ptype_5numpy_ndarray, 1, "next_derr", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_8convolve_16convolve4d_dweight(__pyx_self, __pyx_v_node, __pyx_v_next_derr, __pyx_v_mode, __pyx_v_padding_x, __pyx_v_padding_y, __pyx_v_padding_z, __pyx_v_padding_flug, __pyx_v_rotation);
 
   /* function exit code */
@@ -7614,16 +8062,16 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
   __pyx_pybuffernd_next_derr.rcbuffer = &__pyx_pybuffer_next_derr;
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_node.rcbuffer->pybuffer, (PyObject*)__pyx_v_node, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_node.rcbuffer->pybuffer, (PyObject*)__pyx_v_node, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_node.diminfo[0].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_node.diminfo[0].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_node.diminfo[1].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_node.diminfo[1].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_node.diminfo[2].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_node.diminfo[2].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_node.diminfo[3].strides = __pyx_pybuffernd_node.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_node.diminfo[3].shape = __pyx_pybuffernd_node.rcbuffer->pybuffer.shape[3];
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
-    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_next_derr.rcbuffer->pybuffer, (PyObject*)__pyx_v_next_derr, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_next_derr.rcbuffer->pybuffer, (PyObject*)__pyx_v_next_derr, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES, 4, 0, __pyx_stack) == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_pybuffernd_next_derr.diminfo[0].strides = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_next_derr.diminfo[0].shape = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_next_derr.diminfo[1].strides = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_next_derr.diminfo[1].shape = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_next_derr.diminfo[2].strides = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_next_derr.diminfo[2].shape = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_next_derr.diminfo[3].strides = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_next_derr.diminfo[3].shape = __pyx_pybuffernd_next_derr.rcbuffer->pybuffer.shape[3];
 
-  /* "convolve.pyx":319
+  /* "convolve.pyx":336
  *     #node, next_derr : time, x, y, kernel
  *     #weight : output_kernel, input_kernel, x, y, time
  *     if padding_flug ==0:             # <<<<<<<<<<<<<<
@@ -7633,7 +8081,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
   __pyx_t_1 = ((__pyx_v_padding_flug == 0) != 0);
   if (__pyx_t_1) {
 
-    /* "convolve.pyx":320
+    /* "convolve.pyx":337
  *     #weight : output_kernel, input_kernel, x, y, time
  *     if padding_flug ==0:
  *         if not strcmp(mode,'valid'):             # <<<<<<<<<<<<<<
@@ -7643,7 +8091,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
     __pyx_t_1 = ((!(strcmp(__pyx_v_mode, __pyx_k_valid) != 0)) != 0);
     if (__pyx_t_1) {
 
-      /* "convolve.pyx":321
+      /* "convolve.pyx":338
  *     if padding_flug ==0:
  *         if not strcmp(mode,'valid'):
  *             padding_x = 0             # <<<<<<<<<<<<<<
@@ -7652,7 +8100,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_x = 0;
 
-      /* "convolve.pyx":322
+      /* "convolve.pyx":339
  *         if not strcmp(mode,'valid'):
  *             padding_x = 0
  *             padding_y = 0             # <<<<<<<<<<<<<<
@@ -7661,7 +8109,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_y = 0;
 
-      /* "convolve.pyx":323
+      /* "convolve.pyx":340
  *             padding_x = 0
  *             padding_y = 0
  *             padding_z = 0             # <<<<<<<<<<<<<<
@@ -7672,7 +8120,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
       goto __pyx_L4;
     }
 
-    /* "convolve.pyx":324
+    /* "convolve.pyx":341
  *             padding_y = 0
  *             padding_z = 0
  *         elif not strcmp(mode,'same'):             # <<<<<<<<<<<<<<
@@ -7682,7 +8130,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
     __pyx_t_1 = ((!(strcmp(__pyx_v_mode, __pyx_k_same) != 0)) != 0);
     if (__pyx_t_1) {
 
-      /* "convolve.pyx":325
+      /* "convolve.pyx":342
  *             padding_z = 0
  *         elif not strcmp(mode,'same'):
  *             padding_x = (next_derr.shape[1] - 1) / 2             # <<<<<<<<<<<<<<
@@ -7691,7 +8139,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_x = __Pyx_div_long(((__pyx_v_next_derr->dimensions[1]) - 1), 2);
 
-      /* "convolve.pyx":326
+      /* "convolve.pyx":343
  *         elif not strcmp(mode,'same'):
  *             padding_x = (next_derr.shape[1] - 1) / 2
  *             padding_y = (next_derr.shape[2] - 1) / 2             # <<<<<<<<<<<<<<
@@ -7700,7 +8148,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_y = __Pyx_div_long(((__pyx_v_next_derr->dimensions[2]) - 1), 2);
 
-      /* "convolve.pyx":327
+      /* "convolve.pyx":344
  *             padding_x = (next_derr.shape[1] - 1) / 2
  *             padding_y = (next_derr.shape[2] - 1) / 2
  *             padding_z = (next_derr.shape[0] - 1) / 2             # <<<<<<<<<<<<<<
@@ -7711,7 +8159,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
       goto __pyx_L4;
     }
 
-    /* "convolve.pyx":328
+    /* "convolve.pyx":345
  *             padding_y = (next_derr.shape[2] - 1) / 2
  *             padding_z = (next_derr.shape[0] - 1) / 2
  *         elif not strcmp(mode,'full'):             # <<<<<<<<<<<<<<
@@ -7721,7 +8169,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
     __pyx_t_1 = ((!(strcmp(__pyx_v_mode, __pyx_k_full) != 0)) != 0);
     if (__pyx_t_1) {
 
-      /* "convolve.pyx":329
+      /* "convolve.pyx":346
  *             padding_z = (next_derr.shape[0] - 1) / 2
  *         elif not strcmp(mode,'full'):
  *             padding_x = next_derr.shape[1] - 1             # <<<<<<<<<<<<<<
@@ -7730,7 +8178,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_x = ((__pyx_v_next_derr->dimensions[1]) - 1);
 
-      /* "convolve.pyx":330
+      /* "convolve.pyx":347
  *         elif not strcmp(mode,'full'):
  *             padding_x = next_derr.shape[1] - 1
  *             padding_y = next_derr.shape[2] - 1             # <<<<<<<<<<<<<<
@@ -7739,7 +8187,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
       __pyx_v_padding_y = ((__pyx_v_next_derr->dimensions[2]) - 1);
 
-      /* "convolve.pyx":331
+      /* "convolve.pyx":348
  *             padding_x = next_derr.shape[1] - 1
  *             padding_y = next_derr.shape[2] - 1
  *             padding_z = next_derr.shape[0] - 1             # <<<<<<<<<<<<<<
@@ -7751,25 +8199,25 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
     }
     /*else*/ {
 
-      /* "convolve.pyx":333
+      /* "convolve.pyx":350
  *             padding_z = next_derr.shape[0] - 1
  *         else:
  *             raise NameError('unsupported mode for convolve3d')             # <<<<<<<<<<<<<<
  * 
  *     cdef unsigned int out_x = node.shape[1] + 2*padding_x - next_derr.shape[1] + 1
  */
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_NameError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_NameError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_Raise(__pyx_t_2, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __pyx_L4:;
     goto __pyx_L3;
   }
   __pyx_L3:;
 
-  /* "convolve.pyx":335
+  /* "convolve.pyx":352
  *             raise NameError('unsupported mode for convolve3d')
  * 
  *     cdef unsigned int out_x = node.shape[1] + 2*padding_x - next_derr.shape[1] + 1             # <<<<<<<<<<<<<<
@@ -7778,7 +8226,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
   __pyx_v_out_x = ((((__pyx_v_node->dimensions[1]) + (2 * __pyx_v_padding_x)) - (__pyx_v_next_derr->dimensions[1])) + 1);
 
-  /* "convolve.pyx":336
+  /* "convolve.pyx":353
  * 
  *     cdef unsigned int out_x = node.shape[1] + 2*padding_x - next_derr.shape[1] + 1
  *     cdef unsigned int out_y = node.shape[2] + 2*padding_y - next_derr.shape[2] + 1             # <<<<<<<<<<<<<<
@@ -7787,7 +8235,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
   __pyx_v_out_y = ((((__pyx_v_node->dimensions[2]) + (2 * __pyx_v_padding_y)) - (__pyx_v_next_derr->dimensions[2])) + 1);
 
-  /* "convolve.pyx":337
+  /* "convolve.pyx":354
  *     cdef unsigned int out_x = node.shape[1] + 2*padding_x - next_derr.shape[1] + 1
  *     cdef unsigned int out_y = node.shape[2] + 2*padding_y - next_derr.shape[2] + 1
  *     cdef unsigned int out_z = node.shape[0] + 2*padding_z - next_derr.shape[0] + 1             # <<<<<<<<<<<<<<
@@ -7796,29 +8244,29 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
   __pyx_v_out_z = ((((__pyx_v_node->dimensions[0]) + (2 * __pyx_v_padding_z)) - (__pyx_v_next_derr->dimensions[0])) + 1);
 
-  /* "convolve.pyx":339
+  /* "convolve.pyx":356
  *     cdef unsigned int out_z = node.shape[0] + 2*padding_z - next_derr.shape[0] + 1
  * 
  *     cdef np.ndarray[DTYPE_t, ndim = 5] dweight = np.zeros((next_derr.shape[3],node.shape[3],out_x, out_y, out_z))             # <<<<<<<<<<<<<<
  * 
  *     cdef unsigned int i,j,x,y,z,row,col,depth,s
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_np); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_next_derr->dimensions[3])); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_next_derr->dimensions[3])); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_node->dimensions[3])); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_From_Py_intptr_t((__pyx_v_node->dimensions[3])); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_x); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_x); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_y); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_y); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_z); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = __Pyx_PyInt_From_unsigned_int(__pyx_v_out_z); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_9 = PyTuple_New(5); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_9 = PyTuple_New(5); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_9);
   PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_3);
@@ -7846,28 +8294,28 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
     }
   }
   if (!__pyx_t_8) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_9); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_9); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
     PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_8); __Pyx_GIVEREF(__pyx_t_8); __pyx_t_8 = NULL;
     PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_9);
     __Pyx_GIVEREF(__pyx_t_9);
     __pyx_t_9 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_10 = ((PyArrayObject *)__pyx_t_2);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
     if (unlikely(__Pyx_GetBufferAndValidate(&__pyx_pybuffernd_dweight.rcbuffer->pybuffer, (PyObject*)__pyx_t_10, &__Pyx_TypeInfo_nn___pyx_t_8convolve_DTYPE_t, PyBUF_FORMAT| PyBUF_STRIDES| PyBUF_WRITABLE, 5, 0, __pyx_stack) == -1)) {
       __pyx_v_dweight = ((PyArrayObject *)Py_None); __Pyx_INCREF(Py_None); __pyx_pybuffernd_dweight.rcbuffer->pybuffer.buf = NULL;
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     } else {__pyx_pybuffernd_dweight.diminfo[0].strides = __pyx_pybuffernd_dweight.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_dweight.diminfo[0].shape = __pyx_pybuffernd_dweight.rcbuffer->pybuffer.shape[0]; __pyx_pybuffernd_dweight.diminfo[1].strides = __pyx_pybuffernd_dweight.rcbuffer->pybuffer.strides[1]; __pyx_pybuffernd_dweight.diminfo[1].shape = __pyx_pybuffernd_dweight.rcbuffer->pybuffer.shape[1]; __pyx_pybuffernd_dweight.diminfo[2].strides = __pyx_pybuffernd_dweight.rcbuffer->pybuffer.strides[2]; __pyx_pybuffernd_dweight.diminfo[2].shape = __pyx_pybuffernd_dweight.rcbuffer->pybuffer.shape[2]; __pyx_pybuffernd_dweight.diminfo[3].strides = __pyx_pybuffernd_dweight.rcbuffer->pybuffer.strides[3]; __pyx_pybuffernd_dweight.diminfo[3].shape = __pyx_pybuffernd_dweight.rcbuffer->pybuffer.shape[3]; __pyx_pybuffernd_dweight.diminfo[4].strides = __pyx_pybuffernd_dweight.rcbuffer->pybuffer.strides[4]; __pyx_pybuffernd_dweight.diminfo[4].shape = __pyx_pybuffernd_dweight.rcbuffer->pybuffer.shape[4];
     }
   }
@@ -7875,7 +8323,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
   __pyx_v_dweight = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "convolve.pyx":345
+  /* "convolve.pyx":362
  *     cdef double tmp
  * 
  *     for s in prange(dweight.shape[0]*dweight.shape[1],nogil=True):             # <<<<<<<<<<<<<<
@@ -7894,8 +8342,8 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
             unsigned int __pyx_parallel_temp0 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp1 = 0xbad0bad0;
             int __pyx_parallel_temp2 = 0xbad0bad0;
-            int __pyx_parallel_temp3 = 0xbad0bad0;
-            unsigned int __pyx_parallel_temp4 = 0xbad0bad0;
+            unsigned int __pyx_parallel_temp3 = 0xbad0bad0;
+            int __pyx_parallel_temp4 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp5 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp6 = 0xbad0bad0;
             unsigned int __pyx_parallel_temp7 = 0xbad0bad0;
@@ -7917,7 +8365,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
             if (__pyx_t_13 > 0)
             {
                 #ifdef _OPENMP
-                #pragma omp parallel private(__pyx_t_19, __pyx_t_38, __pyx_t_35, __pyx_t_1, __pyx_t_21, __pyx_t_16, __pyx_t_20, __pyx_t_34, __pyx_t_22, __pyx_t_17, __pyx_t_32, __pyx_t_37, __pyx_t_25, __pyx_t_33, __pyx_t_18, __pyx_t_28, __pyx_t_30, __pyx_t_27, __pyx_t_29, __pyx_t_36, __pyx_t_39, __pyx_t_15, __pyx_t_26, __pyx_t_24, __pyx_t_14, __pyx_t_23, __pyx_t_31) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
+                #pragma omp parallel private(__pyx_t_14, __pyx_t_32, __pyx_t_27, __pyx_t_39, __pyx_t_29, __pyx_t_21, __pyx_t_26, __pyx_t_24, __pyx_t_15, __pyx_t_17, __pyx_t_18, __pyx_t_23, __pyx_t_38, __pyx_t_1, __pyx_t_22, __pyx_t_37, __pyx_t_30, __pyx_t_35, __pyx_t_33, __pyx_t_25, __pyx_t_36, __pyx_t_16, __pyx_t_19, __pyx_t_28, __pyx_t_34, __pyx_t_31, __pyx_t_20) private(__pyx_filename, __pyx_lineno, __pyx_clineno) shared(__pyx_parallel_why, __pyx_parallel_exc_type, __pyx_parallel_exc_value, __pyx_parallel_exc_tb)
                 #endif /* _OPENMP */
                 {
                     #ifdef _OPENMP
@@ -7927,26 +8375,26 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                     Py_BEGIN_ALLOW_THREADS
                     #endif /* _OPENMP */
                     #ifdef _OPENMP
-                    #pragma omp for lastprivate(__pyx_v_z) lastprivate(__pyx_v_x) lastprivate(__pyx_v_node_x) lastprivate(__pyx_v_node_y) firstprivate(__pyx_v_s) lastprivate(__pyx_v_s) lastprivate(__pyx_v_y) lastprivate(__pyx_v_j) lastprivate(__pyx_v_col) lastprivate(__pyx_v_node_z) lastprivate(__pyx_v_row) lastprivate(__pyx_v_i) lastprivate(__pyx_v_depth)
+                    #pragma omp for lastprivate(__pyx_v_row) lastprivate(__pyx_v_z) lastprivate(__pyx_v_node_x) lastprivate(__pyx_v_col) lastprivate(__pyx_v_node_y) firstprivate(__pyx_v_s) lastprivate(__pyx_v_s) lastprivate(__pyx_v_j) lastprivate(__pyx_v_depth) lastprivate(__pyx_v_node_z) lastprivate(__pyx_v_y) lastprivate(__pyx_v_i) lastprivate(__pyx_v_x)
                     #endif /* _OPENMP */
                     for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_13; __pyx_t_12++){
                         if (__pyx_parallel_why < 2)
                         {
                             __pyx_v_s = 0 + 1 * __pyx_t_12;
                             /* Initialize private variables to invalid values */
-                            __pyx_v_z = ((unsigned int)0xbad0bad0);
-                            __pyx_v_x = ((unsigned int)0xbad0bad0);
-                            __pyx_v_node_x = ((int)0xbad0bad0);
-                            __pyx_v_node_y = ((int)0xbad0bad0);
-                            __pyx_v_y = ((unsigned int)0xbad0bad0);
-                            __pyx_v_j = ((unsigned int)0xbad0bad0);
-                            __pyx_v_col = ((unsigned int)0xbad0bad0);
-                            __pyx_v_node_z = ((int)0xbad0bad0);
                             __pyx_v_row = ((unsigned int)0xbad0bad0);
-                            __pyx_v_i = ((unsigned int)0xbad0bad0);
+                            __pyx_v_z = ((unsigned int)0xbad0bad0);
+                            __pyx_v_node_x = ((int)0xbad0bad0);
+                            __pyx_v_col = ((unsigned int)0xbad0bad0);
+                            __pyx_v_node_y = ((int)0xbad0bad0);
+                            __pyx_v_j = ((unsigned int)0xbad0bad0);
                             __pyx_v_depth = ((unsigned int)0xbad0bad0);
+                            __pyx_v_node_z = ((int)0xbad0bad0);
+                            __pyx_v_y = ((unsigned int)0xbad0bad0);
+                            __pyx_v_i = ((unsigned int)0xbad0bad0);
+                            __pyx_v_x = ((unsigned int)0xbad0bad0);
 
-                            /* "convolve.pyx":346
+                            /* "convolve.pyx":363
  * 
  *     for s in prange(dweight.shape[0]*dweight.shape[1],nogil=True):
  *         i = s / dweight.shape[1]             # <<<<<<<<<<<<<<
@@ -7961,11 +8409,11 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                               #ifdef WITH_THREAD
                               PyGILState_Release(__pyx_gilstate_save);
                               #endif
-                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 346; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
+                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 363; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
                             }
                             __pyx_v_i = (__pyx_v_s / (__pyx_v_dweight->dimensions[1]));
 
-                            /* "convolve.pyx":347
+                            /* "convolve.pyx":364
  *     for s in prange(dweight.shape[0]*dweight.shape[1],nogil=True):
  *         i = s / dweight.shape[1]
  *         j = s % dweight.shape[1]             # <<<<<<<<<<<<<<
@@ -7980,11 +8428,11 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                               #ifdef WITH_THREAD
                               PyGILState_Release(__pyx_gilstate_save);
                               #endif
-                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
+                              {__pyx_filename = __pyx_f[0]; __pyx_lineno = 364; __pyx_clineno = __LINE__; goto __pyx_L10_error;}
                             }
                             __pyx_v_j = (__pyx_v_s % (__pyx_v_dweight->dimensions[1]));
 
-                            /* "convolve.pyx":348
+                            /* "convolve.pyx":365
  *         i = s / dweight.shape[1]
  *         j = s % dweight.shape[1]
  *         for x in xrange(dweight.shape[2]):             # <<<<<<<<<<<<<<
@@ -7995,7 +8443,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                             for (__pyx_t_15 = 0; __pyx_t_15 < __pyx_t_14; __pyx_t_15+=1) {
                               __pyx_v_x = __pyx_t_15;
 
-                              /* "convolve.pyx":349
+                              /* "convolve.pyx":366
  *         j = s % dweight.shape[1]
  *         for x in xrange(dweight.shape[2]):
  *             for y in xrange(dweight.shape[3]):             # <<<<<<<<<<<<<<
@@ -8006,7 +8454,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                               for (__pyx_t_17 = 0; __pyx_t_17 < __pyx_t_16; __pyx_t_17+=1) {
                                 __pyx_v_y = __pyx_t_17;
 
-                                /* "convolve.pyx":350
+                                /* "convolve.pyx":367
  *         for x in xrange(dweight.shape[2]):
  *             for y in xrange(dweight.shape[3]):
  *                 for z in xrange(dweight.shape[4]):             # <<<<<<<<<<<<<<
@@ -8017,7 +8465,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                                 for (__pyx_t_19 = 0; __pyx_t_19 < __pyx_t_18; __pyx_t_19+=1) {
                                   __pyx_v_z = __pyx_t_19;
 
-                                  /* "convolve.pyx":351
+                                  /* "convolve.pyx":368
  *             for y in xrange(dweight.shape[3]):
  *                 for z in xrange(dweight.shape[4]):
  *                     for row in xrange(next_derr.shape[1]):             # <<<<<<<<<<<<<<
@@ -8028,7 +8476,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                                   for (__pyx_t_21 = 0; __pyx_t_21 < __pyx_t_20; __pyx_t_21+=1) {
                                     __pyx_v_row = __pyx_t_21;
 
-                                    /* "convolve.pyx":352
+                                    /* "convolve.pyx":369
  *                 for z in xrange(dweight.shape[4]):
  *                     for row in xrange(next_derr.shape[1]):
  *                         for col in xrange(next_derr.shape[2]):             # <<<<<<<<<<<<<<
@@ -8039,7 +8487,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                                     for (__pyx_t_23 = 0; __pyx_t_23 < __pyx_t_22; __pyx_t_23+=1) {
                                       __pyx_v_col = __pyx_t_23;
 
-                                      /* "convolve.pyx":353
+                                      /* "convolve.pyx":370
  *                     for row in xrange(next_derr.shape[1]):
  *                         for col in xrange(next_derr.shape[2]):
  *                             for depth in xrange(next_derr.shape[0]):             # <<<<<<<<<<<<<<
@@ -8050,7 +8498,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                                       for (__pyx_t_25 = 0; __pyx_t_25 < __pyx_t_24; __pyx_t_25+=1) {
                                         __pyx_v_depth = __pyx_t_25;
 
-                                        /* "convolve.pyx":354
+                                        /* "convolve.pyx":371
  *                         for col in xrange(next_derr.shape[2]):
  *                             for depth in xrange(next_derr.shape[0]):
  *                                 node_x = x+row-padding_x             # <<<<<<<<<<<<<<
@@ -8059,7 +8507,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
                                         __pyx_v_node_x = ((__pyx_v_x + __pyx_v_row) - __pyx_v_padding_x);
 
-                                        /* "convolve.pyx":355
+                                        /* "convolve.pyx":372
  *                             for depth in xrange(next_derr.shape[0]):
  *                                 node_x = x+row-padding_x
  *                                 node_y = y+col-padding_y             # <<<<<<<<<<<<<<
@@ -8068,7 +8516,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
                                         __pyx_v_node_y = ((__pyx_v_y + __pyx_v_col) - __pyx_v_padding_y);
 
-                                        /* "convolve.pyx":356
+                                        /* "convolve.pyx":373
  *                                 node_x = x+row-padding_x
  *                                 node_y = y+col-padding_y
  *                                 node_z = z+depth-padding_z             # <<<<<<<<<<<<<<
@@ -8077,7 +8525,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
  */
                                         __pyx_v_node_z = ((__pyx_v_z + __pyx_v_depth) - __pyx_v_padding_z);
 
-                                        /* "convolve.pyx":357
+                                        /* "convolve.pyx":374
  *                                 node_y = y+col-padding_y
  *                                 node_z = z+depth-padding_z
  *                                 if node_x<0 or node_x>node.shape[1]-1 or node_y<0 or node_y>node.shape[2]-1 or node_z<0 or node_z>node.shape[0] - 1:             # <<<<<<<<<<<<<<
@@ -8129,7 +8577,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                                         __pyx_L25_bool_binop_done:;
                                         if (__pyx_t_1) {
 
-                                          /* "convolve.pyx":358
+                                          /* "convolve.pyx":375
  *                                 node_z = z+depth-padding_z
  *                                 if node_x<0 or node_x>node.shape[1]-1 or node_y<0 or node_y>node.shape[2]-1 or node_z<0 or node_z>node.shape[0] - 1:
  *                                     continue             # <<<<<<<<<<<<<<
@@ -8139,7 +8587,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                                           goto __pyx_L22_continue;
                                         }
 
-                                        /* "convolve.pyx":359
+                                        /* "convolve.pyx":376
  *                                 if node_x<0 or node_x>node.shape[1]-1 or node_y<0 or node_y>node.shape[2]-1 or node_z<0 or node_z>node.shape[0] - 1:
  *                                     continue
  *                                 dweight[i,j,x,y,z] += node[node_z, node_x, node_y, j] * next_derr[depth+rotation*(next_derr.shape[0]-1-2*depth),row+rotation*(next_derr.shape[1]-1-2*row),col+rotation*(next_derr.shape[2]-1-2*col),i]             # <<<<<<<<<<<<<<
@@ -8198,18 +8646,18 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
                             #pragma omp critical(__pyx_parallel_lastprivates3)
                             #endif /* _OPENMP */
                             {
-                                __pyx_parallel_temp0 = __pyx_v_z;
-                                __pyx_parallel_temp1 = __pyx_v_x;
+                                __pyx_parallel_temp0 = __pyx_v_row;
+                                __pyx_parallel_temp1 = __pyx_v_z;
                                 __pyx_parallel_temp2 = __pyx_v_node_x;
-                                __pyx_parallel_temp3 = __pyx_v_node_y;
-                                __pyx_parallel_temp4 = __pyx_v_s;
-                                __pyx_parallel_temp5 = __pyx_v_y;
+                                __pyx_parallel_temp3 = __pyx_v_col;
+                                __pyx_parallel_temp4 = __pyx_v_node_y;
+                                __pyx_parallel_temp5 = __pyx_v_s;
                                 __pyx_parallel_temp6 = __pyx_v_j;
-                                __pyx_parallel_temp7 = __pyx_v_col;
+                                __pyx_parallel_temp7 = __pyx_v_depth;
                                 __pyx_parallel_temp8 = __pyx_v_node_z;
-                                __pyx_parallel_temp9 = __pyx_v_row;
+                                __pyx_parallel_temp9 = __pyx_v_y;
                                 __pyx_parallel_temp10 = __pyx_v_i;
-                                __pyx_parallel_temp11 = __pyx_v_depth;
+                                __pyx_parallel_temp11 = __pyx_v_x;
                             }
                             __pyx_L32:;
                             #ifdef _OPENMP
@@ -8239,18 +8687,18 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
               __pyx_parallel_why = 4;
             }
             if (__pyx_parallel_why) {
-              __pyx_v_z = __pyx_parallel_temp0;
-              __pyx_v_x = __pyx_parallel_temp1;
+              __pyx_v_row = __pyx_parallel_temp0;
+              __pyx_v_z = __pyx_parallel_temp1;
               __pyx_v_node_x = __pyx_parallel_temp2;
-              __pyx_v_node_y = __pyx_parallel_temp3;
-              __pyx_v_s = __pyx_parallel_temp4;
-              __pyx_v_y = __pyx_parallel_temp5;
+              __pyx_v_col = __pyx_parallel_temp3;
+              __pyx_v_node_y = __pyx_parallel_temp4;
+              __pyx_v_s = __pyx_parallel_temp5;
               __pyx_v_j = __pyx_parallel_temp6;
-              __pyx_v_col = __pyx_parallel_temp7;
+              __pyx_v_depth = __pyx_parallel_temp7;
               __pyx_v_node_z = __pyx_parallel_temp8;
-              __pyx_v_row = __pyx_parallel_temp9;
+              __pyx_v_y = __pyx_parallel_temp9;
               __pyx_v_i = __pyx_parallel_temp10;
-              __pyx_v_depth = __pyx_parallel_temp11;
+              __pyx_v_x = __pyx_parallel_temp11;
               switch (__pyx_parallel_why) {
                     case 3: goto __pyx_L5_return;
                     case 4:
@@ -8277,7 +8725,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
         #endif
       }
 
-      /* "convolve.pyx":345
+      /* "convolve.pyx":362
  *     cdef double tmp
  * 
  *     for s in prange(dweight.shape[0]*dweight.shape[1],nogil=True):             # <<<<<<<<<<<<<<
@@ -8307,7 +8755,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
       }
   }
 
-  /* "convolve.pyx":399
+  /* "convolve.pyx":416
  *     #                                     continue
  *     #                                 dweight[i,j,x,y,z] += node[node_z, node_x, node_y, j] * next_derr[depth+rotation*(next_derr.shape[0]-1-2*depth),row+rotation*(next_derr.shape[1]-1-2*row),col+rotation*(next_derr.shape[2]-1-2*col),i]
  *     return dweight             # <<<<<<<<<<<<<<
@@ -8319,7 +8767,7 @@ static PyObject *__pyx_pf_8convolve_16convolve4d_dweight(CYTHON_UNUSED PyObject 
   __pyx_r = ((PyObject *)__pyx_v_dweight);
   goto __pyx_L0;
 
-  /* "convolve.pyx":316
+  /* "convolve.pyx":333
  * 
  * @cython.boundscheck(False)
  * def convolve4d_dweight(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 4] next_derr, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
@@ -10437,6 +10885,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_napier, __pyx_k_napier, sizeof(__pyx_k_napier), 0, 0, 1, 1},
   {&__pyx_kp_u_ndarray_is_not_C_contiguous, __pyx_k_ndarray_is_not_C_contiguous, sizeof(__pyx_k_ndarray_is_not_C_contiguous), 0, 1, 0, 0},
   {&__pyx_kp_u_ndarray_is_not_Fortran_contiguou, __pyx_k_ndarray_is_not_Fortran_contiguou, sizeof(__pyx_k_ndarray_is_not_Fortran_contiguou), 0, 1, 0, 0},
+  {&__pyx_n_s_new_derr, __pyx_k_new_derr, sizeof(__pyx_k_new_derr), 0, 0, 1, 1},
   {&__pyx_n_s_next_derr, __pyx_k_next_derr, sizeof(__pyx_k_next_derr), 0, 0, 1, 1},
   {&__pyx_n_s_next_node, __pyx_k_next_node, sizeof(__pyx_k_next_node), 0, 0, 1, 1},
   {&__pyx_n_s_node, __pyx_k_node, sizeof(__pyx_k_node), 0, 0, 1, 1},
@@ -10533,36 +10982,36 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "convolve.pyx":225
+  /* "convolve.pyx":242
  *             padding_z = weight.shape[4] - 1
  *         else:
  *             raise NameError('unsupported mode for convolve3d')             # <<<<<<<<<<<<<<
  * 
  *     cdef unsigned int out_x = node.shape[1] + 2*padding_x - weight.shape[2] + 1
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_unsupported_mode_for_convolve3d); if (unlikely(!__pyx_tuple__5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_s_unsupported_mode_for_convolve3d); if (unlikely(!__pyx_tuple__5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 242; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "convolve.pyx":284
+  /* "convolve.pyx":301
  *             padding_z = weight.shape[4] - 1
  *         else:
  *             raise NameError('unsupported mode for convolve3d')             # <<<<<<<<<<<<<<
  * 
  *     cdef unsigned int out_x = next_derr.shape[1] + 2*padding_x - weight.shape[2] + 1
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_unsupported_mode_for_convolve3d); if (unlikely(!__pyx_tuple__6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_s_unsupported_mode_for_convolve3d); if (unlikely(!__pyx_tuple__6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 301; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "convolve.pyx":333
+  /* "convolve.pyx":350
  *             padding_z = next_derr.shape[0] - 1
  *         else:
  *             raise NameError('unsupported mode for convolve3d')             # <<<<<<<<<<<<<<
  * 
  *     cdef unsigned int out_x = node.shape[1] + 2*padding_x - next_derr.shape[1] + 1
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_unsupported_mode_for_convolve3d); if (unlikely(!__pyx_tuple__7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_unsupported_mode_for_convolve3d); if (unlikely(!__pyx_tuple__7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
 
@@ -10695,50 +11144,50 @@ static int __Pyx_InitCachedConstants(void) {
   /* "convolve.pyx":186
  * 
  * @cython.boundscheck(False)
- * def convolve_recurrent_backward(np.ndarray[DTYPE_t, ndim = 4] a, np.ndarray[DTYPE_t, ndim = 4] b, unsigned int padding_x, unsigned int padding_y):             # <<<<<<<<<<<<<<
+ * def convolve_recurrent_backward(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 4] derr, np.ndarray[DTYPE_t,ndim=4] weight, unsigned int padding_x, unsigned int padding_y):             # <<<<<<<<<<<<<<
  * 
- *     cdef unsigned int i,j,k,l,m,row,col
+ *     cdef unsigned int i,j,k,l,m,row,col,x,y
  */
-  __pyx_tuple__24 = PyTuple_Pack(16, __pyx_n_s_a, __pyx_n_s_b, __pyx_n_s_padding_x, __pyx_n_s_padding_y, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_l, __pyx_n_s_m, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_out_x, __pyx_n_s_out_y, __pyx_n_s_ret, __pyx_n_s_a_x, __pyx_n_s_a_y); if (unlikely(!__pyx_tuple__24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__24 = PyTuple_Pack(20, __pyx_n_s_node, __pyx_n_s_derr, __pyx_n_s_weight, __pyx_n_s_padding_x, __pyx_n_s_padding_y, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_k, __pyx_n_s_l, __pyx_n_s_m, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_out_x, __pyx_n_s_out_y, __pyx_n_s_ret, __pyx_n_s_new_derr, __pyx_n_s_a_x, __pyx_n_s_a_y); if (unlikely(!__pyx_tuple__24)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__24);
   __Pyx_GIVEREF(__pyx_tuple__24);
-  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(4, 0, 16, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mil_saito_Documents_neural, __pyx_n_s_convolve_recurrent_backward, 186, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__25 = (PyObject*)__Pyx_PyCode_New(5, 0, 20, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__24, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mil_saito_Documents_neural, __pyx_n_s_convolve_recurrent_backward, 186, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__25)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "convolve.pyx":210
+  /* "convolve.pyx":227
  * 
  * @cython.boundscheck(False)
  * def convolve4d_forward(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
  *     if padding_flug ==0:
  *         if not strcmp(mode,'valid'):
  */
-  __pyx_tuple__26 = PyTuple_Pack(24, __pyx_n_s_node, __pyx_n_s_weight, __pyx_n_s_mode, __pyx_n_s_padding_x, __pyx_n_s_padding_y, __pyx_n_s_padding_z, __pyx_n_s_padding_flug, __pyx_n_s_rotation, __pyx_n_s_out_x, __pyx_n_s_out_y, __pyx_n_s_out_z, __pyx_n_s_next_node, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_z, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_depth, __pyx_n_s_node_x, __pyx_n_s_node_y, __pyx_n_s_node_z, __pyx_n_s_s); if (unlikely(!__pyx_tuple__26)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__26 = PyTuple_Pack(24, __pyx_n_s_node, __pyx_n_s_weight, __pyx_n_s_mode, __pyx_n_s_padding_x, __pyx_n_s_padding_y, __pyx_n_s_padding_z, __pyx_n_s_padding_flug, __pyx_n_s_rotation, __pyx_n_s_out_x, __pyx_n_s_out_y, __pyx_n_s_out_z, __pyx_n_s_next_node, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_z, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_depth, __pyx_n_s_node_x, __pyx_n_s_node_y, __pyx_n_s_node_z, __pyx_n_s_s); if (unlikely(!__pyx_tuple__26)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__26);
   __Pyx_GIVEREF(__pyx_tuple__26);
-  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(8, 0, 24, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mil_saito_Documents_neural, __pyx_n_s_convolve4d_forward, 210, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(8, 0, 24, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mil_saito_Documents_neural, __pyx_n_s_convolve4d_forward, 227, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "convolve.pyx":269
+  /* "convolve.pyx":286
  * 
  * @cython.boundscheck(False)
  * def convolve4d_backward(np.ndarray[DTYPE_t, ndim = 4] next_derr, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
  *     if padding_flug ==0:
  *         if not strcmp(mode,'valid'):
  */
-  __pyx_tuple__28 = PyTuple_Pack(24, __pyx_n_s_next_derr, __pyx_n_s_weight, __pyx_n_s_mode, __pyx_n_s_padding_x, __pyx_n_s_padding_y, __pyx_n_s_padding_z, __pyx_n_s_padding_flug, __pyx_n_s_rotation, __pyx_n_s_out_x, __pyx_n_s_out_y, __pyx_n_s_out_z, __pyx_n_s_derr, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_z, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_depth, __pyx_n_s_node_x, __pyx_n_s_node_y, __pyx_n_s_node_z, __pyx_n_s_s); if (unlikely(!__pyx_tuple__28)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__28 = PyTuple_Pack(24, __pyx_n_s_next_derr, __pyx_n_s_weight, __pyx_n_s_mode, __pyx_n_s_padding_x, __pyx_n_s_padding_y, __pyx_n_s_padding_z, __pyx_n_s_padding_flug, __pyx_n_s_rotation, __pyx_n_s_out_x, __pyx_n_s_out_y, __pyx_n_s_out_z, __pyx_n_s_derr, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_z, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_depth, __pyx_n_s_node_x, __pyx_n_s_node_y, __pyx_n_s_node_z, __pyx_n_s_s); if (unlikely(!__pyx_tuple__28)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__28);
   __Pyx_GIVEREF(__pyx_tuple__28);
-  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(8, 0, 24, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mil_saito_Documents_neural, __pyx_n_s_convolve4d_backward, 269, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(8, 0, 24, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mil_saito_Documents_neural, __pyx_n_s_convolve4d_backward, 286, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "convolve.pyx":316
+  /* "convolve.pyx":333
  * 
  * @cython.boundscheck(False)
  * def convolve4d_dweight(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 4] next_derr, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
  *     #node, next_derr : time, x, y, kernel
  *     #weight : output_kernel, input_kernel, x, y, time
  */
-  __pyx_tuple__30 = PyTuple_Pack(25, __pyx_n_s_node, __pyx_n_s_next_derr, __pyx_n_s_mode, __pyx_n_s_padding_x, __pyx_n_s_padding_y, __pyx_n_s_padding_z, __pyx_n_s_padding_flug, __pyx_n_s_rotation, __pyx_n_s_out_x, __pyx_n_s_out_y, __pyx_n_s_out_z, __pyx_n_s_dweight, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_z, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_depth, __pyx_n_s_s, __pyx_n_s_node_x, __pyx_n_s_node_y, __pyx_n_s_node_z, __pyx_n_s_tmp); if (unlikely(!__pyx_tuple__30)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__30 = PyTuple_Pack(25, __pyx_n_s_node, __pyx_n_s_next_derr, __pyx_n_s_mode, __pyx_n_s_padding_x, __pyx_n_s_padding_y, __pyx_n_s_padding_z, __pyx_n_s_padding_flug, __pyx_n_s_rotation, __pyx_n_s_out_x, __pyx_n_s_out_y, __pyx_n_s_out_z, __pyx_n_s_dweight, __pyx_n_s_i, __pyx_n_s_j, __pyx_n_s_x, __pyx_n_s_y, __pyx_n_s_z, __pyx_n_s_row, __pyx_n_s_col, __pyx_n_s_depth, __pyx_n_s_s, __pyx_n_s_node_x, __pyx_n_s_node_y, __pyx_n_s_node_z, __pyx_n_s_tmp); if (unlikely(!__pyx_tuple__30)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__30);
   __Pyx_GIVEREF(__pyx_tuple__30);
-  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(8, 0, 25, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mil_saito_Documents_neural, __pyx_n_s_convolve4d_dweight, 316, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__31 = (PyObject*)__Pyx_PyCode_New(8, 0, 25, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__30, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_mil_saito_Documents_neural, __pyx_n_s_convolve4d_dweight, 333, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__31)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -10948,49 +11397,49 @@ PyMODINIT_FUNC PyInit_convolve(void)
   /* "convolve.pyx":186
  * 
  * @cython.boundscheck(False)
- * def convolve_recurrent_backward(np.ndarray[DTYPE_t, ndim = 4] a, np.ndarray[DTYPE_t, ndim = 4] b, unsigned int padding_x, unsigned int padding_y):             # <<<<<<<<<<<<<<
+ * def convolve_recurrent_backward(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 4] derr, np.ndarray[DTYPE_t,ndim=4] weight, unsigned int padding_x, unsigned int padding_y):             # <<<<<<<<<<<<<<
  * 
- *     cdef unsigned int i,j,k,l,m,row,col
+ *     cdef unsigned int i,j,k,l,m,row,col,x,y
  */
   __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8convolve_11convolve_recurrent_backward, NULL, __pyx_n_s_convolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_convolve_recurrent_backward, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 186; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "convolve.pyx":210
+  /* "convolve.pyx":227
  * 
  * @cython.boundscheck(False)
  * def convolve4d_forward(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
  *     if padding_flug ==0:
  *         if not strcmp(mode,'valid'):
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8convolve_13convolve4d_forward, NULL, __pyx_n_s_convolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8convolve_13convolve4d_forward, NULL, __pyx_n_s_convolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_convolve4d_forward, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_convolve4d_forward, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 227; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "convolve.pyx":269
+  /* "convolve.pyx":286
  * 
  * @cython.boundscheck(False)
  * def convolve4d_backward(np.ndarray[DTYPE_t, ndim = 4] next_derr, np.ndarray[DTYPE_t, ndim = 5] weight, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
  *     if padding_flug ==0:
  *         if not strcmp(mode,'valid'):
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8convolve_15convolve4d_backward, NULL, __pyx_n_s_convolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8convolve_15convolve4d_backward, NULL, __pyx_n_s_convolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_convolve4d_backward, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_convolve4d_backward, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "convolve.pyx":316
+  /* "convolve.pyx":333
  * 
  * @cython.boundscheck(False)
  * def convolve4d_dweight(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 4] next_derr, char* mode = 'valid', unsigned int padding_x = 0, unsigned int padding_y = 0, unsigned int padding_z = 0, unsigned int padding_flug = 0, unsigned int rotation = 0):             # <<<<<<<<<<<<<<
  *     #node, next_derr : time, x, y, kernel
  *     #weight : output_kernel, input_kernel, x, y, time
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8convolve_17convolve4d_dweight, NULL, __pyx_n_s_convolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8convolve_17convolve4d_dweight, NULL, __pyx_n_s_convolve); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_convolve4d_dweight, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_convolve4d_dweight, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 333; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "convolve.pyx":1
@@ -12780,6 +13229,11 @@ static CYTHON_INLINE int __Pyx_SetItemInt_Fast(PyObject *o, Py_ssize_t i, PyObje
     }
 #endif
     return __Pyx_SetItemInt_Generic(o, PyInt_FromSsize_t(i), v);
+}
+
+static void __Pyx_RaiseBufferFallbackError(void) {
+  PyErr_SetString(PyExc_ValueError,
+     "Buffer acquisition failed on assignment; and then reacquiring the old buffer failed too!");
 }
 
 static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected) {

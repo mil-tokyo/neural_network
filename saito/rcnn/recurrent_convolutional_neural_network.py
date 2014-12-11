@@ -13,19 +13,19 @@ class RecurrentConvolutionalNeuralNetwork(AbstractNeuralNetwork):
         self.layers = []
         self.activate_function = 'sigmoid'
         self.batch_size = 1
-        self.select_frame = 6
+        self.select_frame = 12
         self.rates = [0.01, 0.01, 0.01]
         # rnn weight & cnn weight & nn weight
 
         #self.layers.append(layer.ActivateLayer(self.activate_function))
         self.layers.append(layer.RecurrentLayer(activate_function = self.activate_function, input_kernel = 256, kernel_shape = (3,3)))
         self.layers.append(layer.ConvolutionalLayer(num_input = 256,num_output = 128,kernel_shape = (4,4,3),stride = 1))
-        self.layers.append(layer.PoolingLayer(kernel_shape = (2,2,2), stride_shape = (2,2,2), pool_type = 'MAX'))
+        self.layers.append(layer.PoolingLayer(kernel_shape = (2,2,1), stride_shape = (2,2,1), pool_type = 'MAX'))
         self.layers.append(layer.ActivateLayer(self.activate_function))
         self.layers.append(layer.ConvolutionalLayer(num_input = 128,num_output = 64,kernel_shape = (3,3,3),stride = 1))
         self.layers.append(layer.ActivateLayer(self.activate_function))
         self.layers.append(layer.SpacialPoolingLayer(select_frame = self.select_frame))
-        self.layers.append(layer.FullyConnectedLayer(3*3*6*64,1024))
+        self.layers.append(layer.FullyConnectedLayer(3*3*12*64,1024))
         self.layers.append(layer.ActivateLayer(self.activate_function))
         self.layers.append(layer.FullyConnectedLayer(1024,324))
         self.layers.append(layer.ActivateLayer(self.activate_function))
@@ -55,7 +55,8 @@ class RecurrentConvolutionalNeuralNetwork(AbstractNeuralNetwork):
             epoch_seed = random.sample(seed, self.batch_size)
             for i in xrange(len(epoch_seed)):
                 self.train_data.append(np.load(self.train_path[epoch_seed[i]]))
-                #self.train_data.append(np.load('/data/ishimochi2/saito/IBC/decaf/conv5/80729.npy'))
+                #self.train_data.append(np.load('/data/ishimochi2/saito/IBC/decaf/conv5/92622.npy'))
+                #self.train_data.append(np.load('/data/ishimochi2/saito/IBC/decaf/conv5/92437.npy'))
                 self.train_data[i] = self.train_data[i].reshape(self.train_data[i].shape[0], self.train_data[i].shape[2], self.train_data[i].shape[3], self.train_data[i].shape[4])
                 self.train_data[i] = self.train_data[i].astype(np.float64)
 

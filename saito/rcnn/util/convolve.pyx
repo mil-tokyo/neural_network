@@ -183,27 +183,44 @@ def convolve_recurrent(np.ndarray[DTYPE_t, ndim = 4] a, np.ndarray[DTYPE_t, ndim
     return a
 
 @cython.boundscheck(False)
-def convolve_recurrent_backward(np.ndarray[DTYPE_t, ndim = 4] a, np.ndarray[DTYPE_t, ndim = 4] b, unsigned int padding_x, unsigned int padding_y):
+def convolve_recurrent_backward(np.ndarray[DTYPE_t, ndim = 4] node, np.ndarray[DTYPE_t, ndim = 4] derr, np.ndarray[DTYPE_t,ndim=4] weight, unsigned int padding_x, unsigned int padding_y):
 
-    cdef unsigned int i,j,k,l,m,row,col
+    cdef unsigned int i,j,k,l,m,row,col,x,y
     cdef unsigned int out_x = padding_x * 2 + 1, out_y = padding_y * 2 + 1
-    cdef np.ndarray[DTYPE_t, ndim=4] ret = np.zeros((a.shape[3],a.shape[3],out_x, out_y))
+    cdef np.ndarray[DTYPE_t, ndim=4] ret = np.zeros((node.shape[3],node.shape[3],out_x, out_y))
+    cdef np.ndarray[DTYPE_t, ndim=4] new_derr = np.zeros((derr.shape[0],derr.shape[1],derr.shape[2],derr.shape[3]))
 
     cdef int a_x, a_y
+    for i in prange(derr.shape[3],nogil=True):
+        for j in xrange(derr.shape[3]):
+            for k in xrange(derr.shape[0] - 1):
+                for x in xrange(derr.shape[1]):
+                    for y in xrange(derr.shape[2]):
+                        for row in xrange(weight.shape[2]):
+                            for col in xrange(weight.shape[3]):
+                                a_x = x+row-padding_x
+                                a_y = y+col-padding_y
+                                if a_x<0 or a_x>derr.shape[1]-1 or a_y<0 or a_y>derr.shape[2]-1:
+                                    continue
+                                new_derr[derr.shape[0]-2-k,x,y,j] += derr[derr.shape[0]-1-k,a_x,a_y,i]*weight[i,j,weight.shape[2]-1-row,weight.shape[3]-1-col]
 
-    for i in prange(a.shape[3], nogil=True):
-        for j in xrange(a.shape[3]):
-            for k in xrange(a.shape[0] - 1):
+                        new_derr[derr.shape[0]-2-k,x,y,j] *= node[derr.shape[0]-2-k,x,y,j]*(1-node[derr.shape[0]-2-k,x,y,j])
+
+    derr = derr + new_derr
+
+    for i in prange(node.shape[3], nogil=True):
+        for j in xrange(node.shape[3]):
+            for k in xrange(node.shape[0] - 1):
                 for l in xrange(out_x):
                     for m in xrange(out_y):
-                        for row in xrange(b.shape[1]):
-                            for col in xrange(b.shape[2]):
+                        for row in xrange(derr.shape[1]):
+                            for col in xrange(derr.shape[2]):
                                 a_x = l+row-padding_x
                                 a_y = m+col-padding_y
-                                if a_x<0 or a_x>a.shape[1]-1 or a_y<0 or a_y>a.shape[2]-1:
+                                if a_x<0 or a_x>node.shape[1]-1 or a_y<0 or a_y>node.shape[2]-1:
                                     continue
-                                ret[i,j,l,m] += a[k,a_x,a_y,j] * b[k+1,row,col,i]
-    return ret
+                                ret[i,j,l,m] += node[k,a_x,a_y,j] * derr[k+1,row,col,i]
+    return ret, derr
 
 
 @cython.boundscheck(False)
@@ -303,7 +320,7 @@ def convolve4d_backward(np.ndarray[DTYPE_t, ndim = 4] next_derr, np.ndarray[DTYP
                                 node_x = x+row-padding_x
                                 node_y = y+col-padding_y
                                 node_z = z+depth - padding_z
-                                if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]:
+                                if node_x<0 or node_x>next_derr.shape[1]-1 or node_y<0 or node_y>next_derr.shape[2]-1 or node_z<0 or node_z>next_derr.shape[0]-1:
                                     continue
                                 derr[z,x,y,j] += next_derr[node_z, node_x, node_y, i] * weight[i,j,row+rotation*(weight.shape[2]-1-2*row),col+rotation*(weight.shape[3]-1-2*col),depth+rotation*(weight.shape[4]-1-2*depth)]
 

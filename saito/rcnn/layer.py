@@ -157,7 +157,7 @@ class RecurrentLayer(AbstractLayer):
     def back(self,next_node = None, next_derr = None):
         self.derr = next_derr * self.dac(self.node)
         # add back propagate from your self
-        self.dweight = convolve_recurrent_backward(self.node, self.derr, self.padding_x, self.padding_y)
+        self.dweight, self.derr = convolve_recurrent_backward(self.node, self.derr, self.dweight, self.padding_x, self.padding_y)
 
     def update(self, rates, batch_size = None):
         # self.weight = (1 - beta) * self.weight - alpha * self.dweight
@@ -189,7 +189,7 @@ class PoolingLayer(AbstractLayer):
         # for i in xrange(next_derr.shape[0]):
         #     self.derr[i,:,:] = self.pos[i,:,:]*np.repeat(np.repeat(next_derr[i,:,:],self.kernel_shape[0],axis=0),self.kernel_shape[1],axis=1)
 
-        self.derr[0:self.pos.shape[0]-self.pos.shape[0]%2] = self.pos[0:self.pos.shape[0]-self.pos.shape[0]%2] * np.repeat(np.repeat(np.repeat(next_derr, self.kernel_shape[0],axis=1),self.kernel_shape[1],axis=2), self.kernel_shape[2], axis=0)
+        self.derr[0:self.pos.shape[0]-self.pos.shape[0]%self.kernel_shape[2]] = self.pos[0:self.pos.shape[0]-self.pos.shape[0]%self.kernel_shape[2]] * np.repeat(np.repeat(np.repeat(next_derr, self.kernel_shape[0],axis=1),self.kernel_shape[1],axis=2), self.kernel_shape[2], axis=0)
 
     def update(self, rate, batch_size = 1):
         '''
