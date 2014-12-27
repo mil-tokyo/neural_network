@@ -18,11 +18,16 @@ class RecurrentNetwork:
         wordnum=ivectors.shape[0]
         word=ivectors[0]
         ivec =self.wordmaplayer.forward(word)
+        sumloss=0
         for t in range(1,wordnum):
             s = self.nonlinearlayer.forward(ivec)
             out=self.outmaplayer.forward(s)
             y = self.outputlayer.forward(out)
             word = ivectors[t]
+            sumloss=sumloss-np.dot(word,np.log(y))
+            if t%100==0:
+                print t,sumloss/100
+                sumloss = 0
             self.backward(word)
             self.update()
             ivec = self.wordmaplayer.forward(word) + self.latentmaplayer.forward(s)
