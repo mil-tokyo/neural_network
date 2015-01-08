@@ -6,6 +6,7 @@ def read_setting():
     """
     network_setting = {
         "learning_rate" : 0.01,
+        "iteration" : 10,
         "batch_size" : 10,
         "layers_setting" : [
             {"layer_type" : "ConvolutionalLayer", 

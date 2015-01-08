@@ -1,13 +1,14 @@
-from network import NeuralNetwork
+from convolutional_neuralnetwork import NeuralNetwork
 import read_setting
 import numpy as np
 import sys
+from sklearn.datasets import fetch_mldata
+from sklearn import preprocessing
 
 def main():
     sys.path.append("./tools/")
     from tools.load_mnist import load_mnist
     train_data, train_label, test_data, test_label = load_mnist()
-    
     label_dim = train_label.shape[1]
 
     ## network setting ##
